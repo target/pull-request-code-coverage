@@ -1,0 +1,67 @@
+build: &build
+  image: golang:1.11.2
+  environment:
+  - CGO_ENABLED=0
+  - GOOS=linux
+  commands:
+  - go get -u github.com/golang/dep/cmd/dep
+  - go get -u github.com/alecthomas/gometalinter
+  - go get github.com/axw/gocov/gocov
+  - go get github.com/AlekSi/gocov-xml
+  - gometalinter --install
+  - dep ensure
+  - go test -v -coverpkg=./... -coverprofile=coverage.txt ./...
+  - go tool cover -func=coverage.txt
+  - gocov convert coverage.txt | gocov-xml > ./coverage.xml
+  - ./bin/lint.sh
+  - go build -a -installsuffix cgo -o plugin .
+
+check-pr-code-coverage: &check-pr-code-coverage
+  image: alpine:latest
+  environment:
+  - PLUGIN_COVERAGE_FILE=./coverage.xml
+  - PLUGIN_COVERAGE_TYPE=cobertura
+  - PLUGIN_SOURCE_DIR=/go/src/git.target.com/search-product-team/pull-request-code-coverage
+  - PLUGIN_RUN_DIR=.
+  commands:
+  - apk --no-cache add git bash
+  - ./scripts/start.sh
+
+workspace:
+  base: /go
+  path: src/git.target.com/search-product-team/pull-request-code-coverage
+
+pipeline:
+
+  build-push:
+    when:
+      event: [push]
+      branch: [master]
+    <<: *build
+
+  build-on-pr:
+    when:
+      event: [pull_request]
+    <<: *build
+
+  check-pr-code-coverage:
+    when:
+      event: [pull_request]
+    <<: *check-pr-code-coverage
+
+  docker:
+    when:
+      event: [push]
+      branch: [master]
+    image: plugins/docker:17.12
+    secrets:
+    - source: docker_username
+      target: plugin_username
+    - source: docker_password
+      target: plugin_password
+    registry: docker.target.com
+    repo: docker.target.com/search/pull-request-code-coverage
+    dockerfile: Dockerfile
+    tags:
+    - latest
+    - "1-${DRONE_COMMIT:0:7}"

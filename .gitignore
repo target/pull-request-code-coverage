@@ -1,0 +1,5 @@
+.idea
+coverage.txt
+coverage.xml
+vendor/
+/plugin

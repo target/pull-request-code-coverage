@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
+<coverage line-rate="0.9619565" branch-rate="0" lines-covered="177" lines-valid="184" branches-covered="0" branches-valid="0" complexity="0" version="" timestamp="1541793228625">
+	<packages>
+		<package name="git.target.com/search-product-team/pull-request-code-coverage" line-rate="0" branch-rate="0" complexity="0" line-count="4" line-hits="0">
+			<classes>
+				<class name="-" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/main.go" line-rate="0" branch-rate="0" complexity="0" line-count="4" line-hits="0">
+					<methods>
+						<method name="main" signature="" line-rate="0" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="10" hits="0"></line>
+								<line number="12" hits="0"></line>
+								<line number="13" hits="0"></line>
+								<line number="17" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="10" hits="0"></line>
+						<line number="12" hits="0"></line>
+						<line number="13" hits="0"></line>
+						<line number="17" hits="0"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+		<package name="git.target.com/search-product-team/pull-request-code-coverage/internal/plugin" line-rate="0.96428573" branch-rate="0" complexity="0" line-count="28" line-hits="27">
+			<classes>
+				<class name="-" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/runner.go" line-rate="0.75" branch-rate="0" complexity="0" line-count="4" line-hits="3">
+					<methods>
+						<method name="NewRunner" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="19" hits="1"></line>
+							</lines>
+						</method>
+						<method name="GetCoverageReportLoader" signature="" line-rate="0.6666667" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="70" hits="1"></line>
+								<line number="72" hits="0"></line>
+								<line number="74" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="19" hits="1"></line>
+						<line number="70" hits="1"></line>
+						<line number="72" hits="0"></line>
+						<line number="74" hits="1"></line>
+					</lines>
+				</class>
+				<class name="DefaultRunner" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/runner.go" line-rate="1" branch-rate="0" complexity="0" line-count="24" line-hits="24">
+					<methods>
+						<method name="Run" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="24" hits="1"></line>
+								<line number="25" hits="1"></line>
+								<line number="26" hits="1"></line>
+								<line number="32" hits="1"></line>
+								<line number="33" hits="1"></line>
+								<line number="34" hits="1"></line>
+								<line number="37" hits="1"></line>
+								<line number="38" hits="1"></line>
+								<line number="39" hits="1"></line>
+								<line number="40" hits="1"></line>
+								<line number="41" hits="1"></line>
+								<line number="43" hits="1"></line>
+								<line number="46" hits="1"></line>
+								<line number="49" hits="1"></line>
+								<line number="50" hits="1"></line>
+								<line number="51" hits="1"></line>
+								<line number="54" hits="1"></line>
+								<line number="55" hits="1"></line>
+								<line number="56" hits="1"></line>
+								<line number="59" hits="1"></line>
+								<line number="60" hits="1"></line>
+								<line number="61" hits="1"></line>
+								<line number="64" hits="1"></line>
+								<line number="66" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="24" hits="1"></line>
+						<line number="25" hits="1"></line>
+						<line number="26" hits="1"></line>
+						<line number="32" hits="1"></line>
+						<line number="33" hits="1"></line>
+						<line number="34" hits="1"></line>
+						<line number="37" hits="1"></line>
+						<line number="38" hits="1"></line>
+						<line number="39" hits="1"></line>
+						<line number="40" hits="1"></line>
+						<line number="41" hits="1"></line>
+						<line number="43" hits="1"></line>
+						<line number="46" hits="1"></line>
+						<line number="49" hits="1"></line>
+						<line number="50" hits="1"></line>
+						<line number="51" hits="1"></line>
+						<line number="54" hits="1"></line>
+						<line number="55" hits="1"></line>
+						<line number="56" hits="1"></line>
+						<line number="59" hits="1"></line>
+						<line number="60" hits="1"></line>
+						<line number="61" hits="1"></line>
+						<line number="64" hits="1"></line>
+						<line number="66" hits="1"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+		<package name="git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/calculator" line-rate="1" branch-rate="0" complexity="0" line-count="10" line-hits="10">
+			<classes>
+				<class name="-" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/calculator/calculator.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
+					<methods>
+						<method name="NewCoverage" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="14" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="14" hits="1"></line>
+					</lines>
+				</class>
+				<class name="DefaultCoverage" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/calculator/calculator.go" line-rate="1" branch-rate="0" complexity="0" line-count="9" line-hits="9">
+					<methods>
+						<method name="DetermineCoverage" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="20" hits="1"></line>
+								<line number="22" hits="1"></line>
+								<line number="24" hits="1"></line>
+								<line number="25" hits="1"></line>
+								<line number="28" hits="1"></line>
+								<line number="30" hits="1"></line>
+								<line number="31" hits="1"></line>
+								<line number="36" hits="1"></line>
+								<line number="43" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="20" hits="1"></line>
+						<line number="22" hits="1"></line>
+						<line number="24" hits="1"></line>
+						<line number="25" hits="1"></line>
+						<line number="28" hits="1"></line>
+						<line number="30" hits="1"></line>
+						<line number="31" hits="1"></line>
+						<line number="36" hits="1"></line>
+						<line number="43" hits="1"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+		<package name="git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/golang" line-rate="0" branch-rate="0" complexity="0" line-count="2" line-hits="0">
+			<classes>
+				<class name="-" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/golang/report.go" line-rate="0" branch-rate="0" complexity="0" line-count="1" line-hits="0">
+					<methods>
+						<method name="NewReportLoader" signature="" line-rate="0" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="14" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="14" hits="0"></line>
+					</lines>
+				</class>
+				<class name="DefaultLoader" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/golang/report.go" line-rate="0" branch-rate="0" complexity="0" line-count="1" line-hits="0">
+					<methods>
+						<method name="Load" signature="" line-rate="0" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="20" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="20" hits="0"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+		<package name="git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/jacoco" line-rate="1" branch-rate="0" complexity="0" line-count="29" line-hits="29">
+			<classes>
+				<class name="DefaultLoader" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="11" line-hits="11">
+					<methods>
+						<method name="Load" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="33" hits="1"></line>
+								<line number="35" hits="1"></line>
+								<line number="36" hits="1"></line>
+								<line number="39" hits="1"></line>
+								<line number="41" hits="1"></line>
+								<line number="42" hits="1"></line>
+								<line number="43" hits="1"></line>
+								<line number="46" hits="1"></line>
+								<line number="47" hits="1"></line>
+								<line number="48" hits="1"></line>
+								<line number="51" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="33" hits="1"></line>
+						<line number="35" hits="1"></line>
+						<line number="36" hits="1"></line>
+						<line number="39" hits="1"></line>
+						<line number="41" hits="1"></line>
+						<line number="42" hits="1"></line>
+						<line number="43" hits="1"></line>
+						<line number="46" hits="1"></line>
+						<line number="47" hits="1"></line>
+						<line number="48" hits="1"></line>
+						<line number="51" hits="1"></line>
+					</lines>
+				</class>
+				<class name="Report" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
+					<methods>
+						<method name="Name" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="61" hits="1"></line>
+							</lines>
+						</method>
+						<method name="GetCoverageData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="65" hits="1"></line>
+								<line number="66" hits="1"></line>
+								<line number="67" hits="1"></line>
+								<line number="71" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="61" hits="1"></line>
+						<line number="65" hits="1"></line>
+						<line number="66" hits="1"></line>
+						<line number="67" hits="1"></line>
+						<line number="71" hits="1"></line>
+					</lines>
+				</class>
+				<class name="Package" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="4" line-hits="4">
+					<methods>
+						<method name="GetCoverageData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="82" hits="1"></line>
+								<line number="83" hits="1"></line>
+								<line number="84" hits="1"></line>
+								<line number="88" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="82" hits="1"></line>
+						<line number="83" hits="1"></line>
+						<line number="84" hits="1"></line>
+						<line number="88" hits="1"></line>
+					</lines>
+				</class>
+				<class name="SourceFile" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
+					<methods>
+						<method name="GetCoverageData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="99" hits="1"></line>
+								<line number="100" hits="1"></line>
+								<line number="101" hits="1"></line>
+								<line number="102" hits="1"></line>
+								<line number="106" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="99" hits="1"></line>
+						<line number="100" hits="1"></line>
+						<line number="101" hits="1"></line>
+						<line number="102" hits="1"></line>
+						<line number="106" hits="1"></line>
+					</lines>
+				</class>
+				<class name="CoverageData" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
+					<methods>
+						<method name="toDomain" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="122" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="122" hits="1"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="3" line-hits="3">
+					<methods>
+						<method name="NewReportLoader" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="26" hits="1"></line>
+							</lines>
+						</method>
+						<method name="silentlyCall" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="55" hits="1"></line>
+								<line number="56" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="26" hits="1"></line>
+						<line number="55" hits="1"></line>
+						<line number="56" hits="1"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+		<package name="git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain" line-rate="1" branch-rate="0" complexity="0" line-count="19" line-hits="19">
+			<classes>
+				<class name="SourceLineCoverageReport" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain/domain.go" line-rate="1" branch-rate="0" complexity="0" line-count="18" line-hits="18">
+					<methods>
+						<method name="TotalLinesWithData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="6" hits="1"></line>
+								<line number="8" hits="1"></line>
+								<line number="9" hits="1"></line>
+								<line number="10" hits="1"></line>
+								<line number="14" hits="1"></line>
+							</lines>
+						</method>
+						<method name="TotalLinesWithoutData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="18" hits="1"></line>
+								<line number="20" hits="1"></line>
+								<line number="21" hits="1"></line>
+								<line number="22" hits="1"></line>
+								<line number="26" hits="1"></line>
+							</lines>
+						</method>
+						<method name="TotalCoveredInstructions" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="30" hits="1"></line>
+								<line number="32" hits="1"></line>
+								<line number="33" hits="1"></line>
+								<line number="36" hits="1"></line>
+							</lines>
+						</method>
+						<method name="TotalMissedInstructions" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="40" hits="1"></line>
+								<line number="42" hits="1"></line>
+								<line number="43" hits="1"></line>
+								<line number="46" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="6" hits="1"></line>
+						<line number="8" hits="1"></line>
+						<line number="9" hits="1"></line>
+						<line number="10" hits="1"></line>
+						<line number="14" hits="1"></line>
+						<line number="18" hits="1"></line>
+						<line number="20" hits="1"></line>
+						<line number="21" hits="1"></line>
+						<line number="22" hits="1"></line>
+						<line number="26" hits="1"></line>
+						<line number="30" hits="1"></line>
+						<line number="32" hits="1"></line>
+						<line number="33" hits="1"></line>
+						<line number="36" hits="1"></line>
+						<line number="40" hits="1"></line>
+						<line number="42" hits="1"></line>
+						<line number="43" hits="1"></line>
+						<line number="46" hits="1"></line>
+					</lines>
+				</class>
+				<class name="SourceLineCoverage" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain/domain.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
+					<methods>
+						<method name="HasData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="55" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="55" hits="1"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+		<package name="git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/reporter" line-rate="1" branch-rate="0" complexity="0" line-count="25" line-hits="25">
+			<classes>
+				<class name="-" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/reporter/reporter.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
+					<methods>
+						<method name="NewSimple" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="20" hits="1"></line>
+							</lines>
+						</method>
+						<method name="toPercent" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="52" hits="1"></line>
+							</lines>
+						</method>
+						<method name="safeDiv" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="56" hits="1"></line>
+								<line number="57" hits="1"></line>
+								<line number="60" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="20" hits="1"></line>
+						<line number="52" hits="1"></line>
+						<line number="56" hits="1"></line>
+						<line number="57" hits="1"></line>
+						<line number="60" hits="1"></line>
+					</lines>
+				</class>
+				<class name="Simple" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/reporter/reporter.go" line-rate="1" branch-rate="0" complexity="0" line-count="20" line-hits="20">
+					<methods>
+						<method name="Write" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="27" hits="1"></line>
+								<line number="28" hits="1"></line>
+								<line number="29" hits="1"></line>
+								<line number="30" hits="1"></line>
+								<line number="31" hits="1"></line>
+								<line number="35" hits="1"></line>
+								<line number="36" hits="1"></line>
+								<line number="37" hits="1"></line>
+								<line number="39" hits="1"></line>
+								<line number="40" hits="1"></line>
+								<line number="41" hits="1"></line>
+								<line number="43" hits="1"></line>
+								<line number="44" hits="1"></line>
+								<line number="45" hits="1"></line>
+								<line number="46" hits="1"></line>
+								<line number="47" hits="1"></line>
+								<line number="48" hits="1"></line>
+							</lines>
+						</method>
+						<method name="printf" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="64" hits="1"></line>
+								<line number="65" hits="1"></line>
+							</lines>
+						</method>
+						<method name="lineDescription" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="70" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="27" hits="1"></line>
+						<line number="28" hits="1"></line>
+						<line number="29" hits="1"></line>
+						<line number="30" hits="1"></line>
+						<line number="31" hits="1"></line>
+						<line number="35" hits="1"></line>
+						<line number="36" hits="1"></line>
+						<line number="37" hits="1"></line>
+						<line number="39" hits="1"></line>
+						<line number="40" hits="1"></line>
+						<line number="41" hits="1"></line>
+						<line number="43" hits="1"></line>
+						<line number="44" hits="1"></line>
+						<line number="45" hits="1"></line>
+						<line number="46" hits="1"></line>
+						<line number="47" hits="1"></line>
+						<line number="48" hits="1"></line>
+						<line number="64" hits="1"></line>
+						<line number="65" hits="1"></line>
+						<line number="70" hits="1"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+		<package name="git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff" line-rate="1" branch-rate="0" complexity="0" line-count="64" line-hits="64">
+			<classes>
+				<class name="-" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff/changed_source_loader.go" line-rate="1" branch-rate="0" complexity="0" line-count="59" line-hits="59">
+					<methods>
+						<method name="NewChangedSourceLinesLoader" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="19" hits="1"></line>
+							</lines>
+						</method>
+						<method name="getChangedLinesFromUnifiedDiff" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="45" hits="1"></line>
+								<line number="47" hits="1"></line>
+								<line number="48" hits="1"></line>
+								<line number="49" hits="1"></line>
+								<line number="50" hits="1"></line>
+								<line number="51" hits="1"></line>
+								<line number="52" hits="1"></line>
+								<line number="53" hits="1"></line>
+								<line number="55" hits="1"></line>
+								<line number="56" hits="1"></line>
+								<line number="58" hits="1"></line>
+								<line number="59" hits="1"></line>
+								<line number="62" hits="1"></line>
+								<line number="63" hits="1"></line>
+								<line number="64" hits="1"></line>
+								<line number="65" hits="1"></line>
+								<line number="67" hits="1"></line>
+								<line number="69" hits="1"></line>
+								<line number="71" hits="1"></line>
+								<line number="72" hits="1"></line>
+								<line number="75" hits="1"></line>
+								<line number="76" hits="1"></line>
+								<line number="79" hits="1"></line>
+								<line number="80" hits="1"></line>
+								<line number="82" hits="1"></line>
+								<line number="83" hits="1"></line>
+								<line number="84" hits="1"></line>
+								<line number="87" hits="1"></line>
+								<line number="88" hits="1"></line>
+								<line number="89" hits="1"></line>
+								<line number="90" hits="1"></line>
+								<line number="92" hits="1"></line>
+								<line number="95" hits="1"></line>
+								<line number="96" hits="1"></line>
+								<line number="97" hits="1"></line>
+								<line number="98" hits="1"></line>
+								<line number="100" hits="1"></line>
+								<line number="101" hits="1"></line>
+								<line number="104" hits="1"></line>
+								<line number="105" hits="1"></line>
+								<line number="107" hits="1"></line>
+								<line number="108" hits="1"></line>
+								<line number="109" hits="1"></line>
+								<line number="110" hits="1"></line>
+								<line number="113" hits="1"></line>
+								<line number="115" hits="1"></line>
+								<line number="116" hits="1"></line>
+								<line number="117" hits="1"></line>
+								<line number="118" hits="1"></line>
+								<line number="119" hits="1"></line>
+								<line number="122" hits="1"></line>
+								<line number="125" hits="1"></line>
+								<line number="127" hits="1"></line>
+								<line number="128" hits="1"></line>
+								<line number="131" hits="1"></line>
+								<line number="140" hits="1"></line>
+								<line number="141" hits="1"></line>
+								<line number="145" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="19" hits="1"></line>
+						<line number="45" hits="1"></line>
+						<line number="47" hits="1"></line>
+						<line number="48" hits="1"></line>
+						<line number="49" hits="1"></line>
+						<line number="50" hits="1"></line>
+						<line number="51" hits="1"></line>
+						<line number="52" hits="1"></line>
+						<line number="53" hits="1"></line>
+						<line number="55" hits="1"></line>
+						<line number="56" hits="1"></line>
+						<line number="58" hits="1"></line>
+						<line number="59" hits="1"></line>
+						<line number="62" hits="1"></line>
+						<line number="63" hits="1"></line>
+						<line number="64" hits="1"></line>
+						<line number="65" hits="1"></line>
+						<line number="67" hits="1"></line>
+						<line number="69" hits="1"></line>
+						<line number="71" hits="1"></line>
+						<line number="72" hits="1"></line>
+						<line number="75" hits="1"></line>
+						<line number="76" hits="1"></line>
+						<line number="79" hits="1"></line>
+						<line number="80" hits="1"></line>
+						<line number="82" hits="1"></line>
+						<line number="83" hits="1"></line>
+						<line number="84" hits="1"></line>
+						<line number="87" hits="1"></line>
+						<line number="88" hits="1"></line>
+						<line number="89" hits="1"></line>
+						<line number="90" hits="1"></line>
+						<line number="92" hits="1"></line>
+						<line number="95" hits="1"></line>
+						<line number="96" hits="1"></line>
+						<line number="97" hits="1"></line>
+						<line number="98" hits="1"></line>
+						<line number="100" hits="1"></line>
+						<line number="101" hits="1"></line>
+						<line number="104" hits="1"></line>
+						<line number="105" hits="1"></line>
+						<line number="107" hits="1"></line>
+						<line number="108" hits="1"></line>
+						<line number="109" hits="1"></line>
+						<line number="110" hits="1"></line>
+						<line number="113" hits="1"></line>
+						<line number="115" hits="1"></line>
+						<line number="116" hits="1"></line>
+						<line number="117" hits="1"></line>
+						<line number="118" hits="1"></line>
+						<line number="119" hits="1"></line>
+						<line number="122" hits="1"></line>
+						<line number="125" hits="1"></line>
+						<line number="127" hits="1"></line>
+						<line number="128" hits="1"></line>
+						<line number="131" hits="1"></line>
+						<line number="140" hits="1"></line>
+						<line number="141" hits="1"></line>
+						<line number="145" hits="1"></line>
+					</lines>
+				</class>
+				<class name="Loader" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff/changed_source_loader.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
+					<methods>
+						<method name="Load" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="27" hits="1"></line>
+								<line number="29" hits="1"></line>
+								<line number="30" hits="1"></line>
+								<line number="31" hits="1"></line>
+								<line number="34" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="27" hits="1"></line>
+						<line number="29" hits="1"></line>
+						<line number="30" hits="1"></line>
+						<line number="31" hits="1"></line>
+						<line number="34" hits="1"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+		<package name="git.target.com/search-product-team/pull-request-code-coverage/internal/test/mocks" line-rate="1" branch-rate="0" complexity="0" line-count="3" line-hits="3">
+			<classes>
+				<class name="-" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/test/mocks/property_getter.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
+					<methods>
+						<method name="NewMockPropertyGetter" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="10" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="10" hits="1"></line>
+					</lines>
+				</class>
+				<class name="MockPropertyGetter" filename="/go/git.target.com/search-product-team/pull-request-code-coverage/internal/test/mocks/property_getter.go" line-rate="1" branch-rate="0" complexity="0" line-count="2" line-hits="2">
+					<methods>
+						<method name="GetProperty" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
+							<lines>
+								<line number="14" hits="1"></line>
+								<line number="15" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="14" hits="1"></line>
+						<line number="15" hits="1"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+	</packages>
+</coverage>

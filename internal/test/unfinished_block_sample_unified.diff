@@ -1,0 +1,17 @@
+diff --git a/category-search/test.something b/category-search/test.something
+new file mode 100644
+index 0000000..d5418b3
+--- /dev/null
++++ b/category-search/test.something
+@@ -0,0 +1,3 @@
++hello
+diff --git a/category-search/build.gradle b/category-search/build.gradle
+deleted file mode 100755
+index d2b532c..0000000
+--- a/category-search/build.gradle
++++ /dev/null
+@@ -1,3 +0,0 @@
+-dependencies {
+-	compile project(':search-common')
+-}
+\ No newline at end of file
