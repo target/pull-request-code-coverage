@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
-env
+if [[ ! -f ~/.netrc ]]
+then
+    echo "~/.netrc does not exist, creating..."
+    cat >~/.netrc <<EOF
+machine $DRONE_NETRC_MACHINE
+login $DRONE_NETRC_USERNAME
+password $DRONE_NETRC_PASSWORD
+EOF
+fi
+
+set -x
 
 PLUGIN_MODULE="${PLUGIN_MODULE:-}"
 PLUGIN_RUN_DIR="${PLUGIN_RUN_DIR:-}"

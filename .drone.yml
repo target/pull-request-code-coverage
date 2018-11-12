@@ -30,10 +30,12 @@ check-pr-code-coverage: &check-pr-code-coverage
 #check-pr-code-coverage: &check-pr-code-coverage
 #  when:
 #    event: [pull_request]
-#  image: docker.target.com/search/pull-request-code-coverage:1-075d586
+#  image: docker.target.com/search/pull-request-code-coverage:1-2194c5a
 #  coverage_type: cobertura
 #  source_dir: /go/src/git.target.com/search-product-team/pull-request-code-coverage
 #  coverage_file: ./coverage.xml
+#  commands:
+#    - /start.sh
 
 workspace:
   base: /go
