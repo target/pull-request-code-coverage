@@ -2,6 +2,8 @@
 
 set -Eeuo pipefail
 
+cat /etc/resolv.conf
+
 PLUGIN_MODULE="${PLUGIN_MODULE:-}"
 PLUGIN_RUN_DIR="${PLUGIN_RUN_DIR:-}"
 

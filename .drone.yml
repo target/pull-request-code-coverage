@@ -4,6 +4,7 @@ build: &build
   - CGO_ENABLED=0
   - GOOS=linux
   commands:
+  - cat /etc/resolv.conf
   - go get -u github.com/golang/dep/cmd/dep
   - go get -u github.com/alecthomas/gometalinter
   - go get github.com/axw/gocov/gocov
@@ -24,8 +25,16 @@ check-pr-code-coverage: &check-pr-code-coverage
   - PLUGIN_SOURCE_DIR=/go/src/git.target.com/search-product-team/pull-request-code-coverage
   - PLUGIN_RUN_DIR=.
   commands:
-  - apk --no-cache add git bash
+  - apk --no-cache add ca-certificates git bash openssh-client
   - ./scripts/start.sh
+
+#check-pr-code-coverage: &check-pr-code-coverage
+#  when:
+#    event: [pull_request]
+#  image: docker.target.com/search/pull-request-code-coverage:1-a5a9405
+#  coverage_type: cobertura
+#  source_dir: /go/src/git.target.com/search-product-team/pull-request-code-coverage
+#  coverage_file: ./coverage.xml
 
 workspace:
   base: /go
