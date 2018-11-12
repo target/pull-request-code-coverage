@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
-cat /etc/resolv.conf
+env
 
 PLUGIN_MODULE="${PLUGIN_MODULE:-}"
 PLUGIN_RUN_DIR="${PLUGIN_RUN_DIR:-}"

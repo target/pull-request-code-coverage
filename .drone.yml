@@ -4,7 +4,6 @@ build: &build
   - CGO_ENABLED=0
   - GOOS=linux
   commands:
-  - cat /etc/resolv.conf
   - go get -u github.com/golang/dep/cmd/dep
   - go get -u github.com/alecthomas/gometalinter
   - go get github.com/axw/gocov/gocov
@@ -31,7 +30,7 @@ check-pr-code-coverage: &check-pr-code-coverage
 #check-pr-code-coverage: &check-pr-code-coverage
 #  when:
 #    event: [pull_request]
-#  image: docker.target.com/search/pull-request-code-coverage:1-a5a9405
+#  image: docker.target.com/search/pull-request-code-coverage:1-075d586
 #  coverage_type: cobertura
 #  source_dir: /go/src/git.target.com/search-product-team/pull-request-code-coverage
 #  coverage_file: ./coverage.xml
