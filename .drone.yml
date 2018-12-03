@@ -23,6 +23,10 @@ check-pr-code-coverage: &check-pr-code-coverage
   - PLUGIN_COVERAGE_TYPE=cobertura
   - PLUGIN_SOURCE_DIR=/go/src/git.target.com/search-product-team/pull-request-code-coverage
   - PLUGIN_RUN_DIR=.
+  - PLUGIN_GH_API_BASE_URL=https://git.target.com
+  secrets:
+  - source: pull_request_api_key
+    target: plugin_gh_api_key
   commands:
   - apk --no-cache add ca-certificates git bash openssh-client
   - ./scripts/start.sh
