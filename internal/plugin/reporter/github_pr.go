@@ -35,6 +35,10 @@ func NewGithubPullRequest(apiKey string, apiBaseURL string, pr string, owner str
 
 func (s *GithubPullRequest) Write(changedLinesWithCoverage domain.SourceLineCoverageReport) error {
 
+	if changedLinesWithCoverage.TotalLinesWithData() == 0 {
+		return nil
+	}
+
 	body, bodyErr := s.createCommentBody(changedLinesWithCoverage)
 
 	if bodyErr != nil {

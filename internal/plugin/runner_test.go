@@ -161,6 +161,42 @@ Covered Instructions        -> **73%** (8)
 	})
 }
 
+func TestDefaultRunner_Run_NoChanges(t *testing.T) {
+
+	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
+
+		propGetter := mocks.NewMockPropertyGetter()
+
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReportEmpty.xml", true)
+		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
+		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("123", true)
+		propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("some_org", true)
+		propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("some_repo", true)
+
+		var buf bytes.Buffer
+
+		err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified.diff"), &buf)
+		assert.NoError(t, err)
+
+		assert.Equal(t, `Missed Instructions:
+
+Code Coverage Summary:
+Lines Without Coverage Data -> 100% (9)
+Lines With Coverage Data    -> 0% (0)
+Covered Instructions        -> 100% (0)
+Missed Instructions         -> 0% (0)
+`, buf.String())
+
+		requestAsserter.AssertNoRequestsWereMade(t)
+
+		propGetter.AssertExpectations(t)
+	})
+}
+
 func TestDefaultRunner_RunNoCoverageData(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
 

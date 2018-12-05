@@ -36,10 +36,15 @@ func WithMockGithubAPI(doer func(mockServerURL string, requestAsserter GithubAPI
 
 type GithubAPIRequestAsserter interface {
 	AssertRequestWasMade(t *testing.T, path string, apikey string, body map[string]interface{})
+	AssertNoRequestsWereMade(t *testing.T)
 }
 
 type DefaultGithubAPIRequestAsserter struct {
 	requests []*CapturedRequest
+}
+
+func (a *DefaultGithubAPIRequestAsserter) AssertNoRequestsWereMade(t *testing.T) {
+	assert.Equal(t, 0, len(a.requests))
 }
 
 func (a *DefaultGithubAPIRequestAsserter) AssertRequestWasMade(t *testing.T, path string, apikey string, body map[string]interface{}) {

@@ -23,7 +23,13 @@ func TestGithubPullRequest_Write_FailedNewRequest(t *testing.T) {
 		jsonClient: &pluginjson.DefaultClient{},
 	}
 
-	e := writer.Write(domain.SourceLineCoverageReport{})
+	e := writer.Write(domain.SourceLineCoverageReport{
+		domain.SourceLineCoverage{
+			CoverageData: domain.CoverageData{
+				CoveredInstructionCount: 1,
+			},
+		},
+	})
 
 	assert.EqualError(t, e, "Failed creating request to github: something bad happened")
 }
@@ -42,7 +48,13 @@ func TestGithubPullRequest_Write_FailedDo(t *testing.T) {
 		jsonClient: &pluginjson.DefaultClient{},
 	}
 
-	e := writer.Write(domain.SourceLineCoverageReport{})
+	e := writer.Write(domain.SourceLineCoverageReport{
+		domain.SourceLineCoverage{
+			CoverageData: domain.CoverageData{
+				CoveredInstructionCount: 1,
+			},
+		},
+	})
 
 	assert.EqualError(t, e, "Failed calling github: something bad happened")
 }
@@ -61,7 +73,13 @@ func TestGithubPullRequest_Write_FailedDo_BadStatus(t *testing.T) {
 		jsonClient: &pluginjson.DefaultClient{},
 	}
 
-	e := writer.Write(domain.SourceLineCoverageReport{})
+	e := writer.Write(domain.SourceLineCoverageReport{
+		domain.SourceLineCoverage{
+			CoverageData: domain.CoverageData{
+				CoveredInstructionCount: 1,
+			},
+		},
+	})
 
 	assert.EqualError(t, e, "Failed calling github: bad status code: 400")
 }
@@ -78,7 +96,13 @@ func TestGithubPullRequest_Write_FailedJsonMarshal(t *testing.T) {
 		jsonClient: mockClient,
 	}
 
-	e := writer.Write(domain.SourceLineCoverageReport{})
+	e := writer.Write(domain.SourceLineCoverageReport{
+		domain.SourceLineCoverage{
+			CoverageData: domain.CoverageData{
+				CoveredInstructionCount: 1,
+			},
+		},
+	})
 
 	assert.EqualError(t, e, "Failed creating payload for github: Failed marshalling payload to json: something bad happened")
 }
