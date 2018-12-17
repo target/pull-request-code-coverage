@@ -11,14 +11,14 @@ import (
 )
 
 type Loader struct {
-	Module    string
-	SourceDir string
+	Module     string
+	SourceDirs []string
 }
 
-func NewChangedSourceLinesLoader(Module string, SourceDir string) *Loader {
+func NewChangedSourceLinesLoader(Module string, SourceDirs []string) *Loader {
 	return &Loader{
-		Module:    Module,
-		SourceDir: SourceDir,
+		Module:     Module,
+		SourceDirs: SourceDirs,
 	}
 }
 
@@ -31,7 +31,7 @@ func (l *Loader) Load(inReader io.Reader) ([]domain.SourceLine, error) {
 		lines = append(lines, scanner.Text())
 	}
 
-	return getChangedLinesFromUnifiedDiff(lines, l.Module, l.SourceDir)
+	return getChangedLinesFromUnifiedDiff(lines, l.Module, l.SourceDirs)
 }
 
 var changedFileLine = regexp.MustCompile("^[+][+][+][ ]b?[/](.*)")
@@ -40,7 +40,7 @@ var addedLine = regexp.MustCompile("^[+].*")
 var emptyStr = ""
 
 // nolint: gocyclo
-func getChangedLinesFromUnifiedDiff(unifiedDiffLines []string, module string, sourceDir string) ([]domain.SourceLine, error) {
+func getChangedLinesFromUnifiedDiff(unifiedDiffLines []string, module string, sourceDirs []string) ([]domain.SourceLine, error) {
 
 	result := []domain.SourceLine{}
 
@@ -84,7 +84,7 @@ func getChangedLinesFromUnifiedDiff(unifiedDiffLines []string, module string, so
 				currentFilename = &(fileNameParts[len(fileNameParts)-1])
 			}
 
-			if strings.HasPrefix(workingPkg, sourceDir+"/") {
+			if sourceDir, found := findSourcePrefix(workingPkg, sourceDirs); found {
 				sourceDirLessPkg := workingPkg[len(sourceDir+"/"):]
 				currentPkg = &sourceDirLessPkg
 				currentSourceDir = &sourceDir
@@ -143,4 +143,14 @@ func getChangedLinesFromUnifiedDiff(unifiedDiffLines []string, module string, so
 	}
 
 	return result, nil
+}
+
+func findSourcePrefix(workingPkg string, sourceDirs []string) (string, bool) {
+	for _, sourceDir := range sourceDirs {
+		if strings.HasPrefix(workingPkg, sourceDir+"/") {
+			return sourceDir, true
+		}
+	}
+
+	return "", false
 }

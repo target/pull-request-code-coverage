@@ -1,0 +1,70 @@
+diff --git a/category-search/build.gradle b/category-search/build.gradle
+deleted file mode 100755
+index d2b532c..0000000
+--- a/category-search/build.gradle
++++ /dev/null
+@@ -1,3 +0,0 @@
+-dependencies {
+-	compile project(':search-common')
+-}
+\ No newline at end of file
+diff --git a/category-search/test.something b/category-search/test.something
+new file mode 100644
+index 0000000..d5418b3
+--- /dev/null
++++ b/category-search/test.something
+@@ -0,0 +1,3 @@
++hello
++world
++there
+index 17c8964..8c5cbec 100755
+--- a/category-search/gradle.properties
++++ b/category-search/gradle.properties
+@@ -1,14 +1,2 @@
+-excludeCodeCoverageClasses=com.tgt.search.common.entity.*,com.tgt.search.common.config.AppConfig,\
+-	com.tgt.search.common.constants.*,com.tgt.search.common.cache.FacetsCache,,com.tgt.search.common.cache.CategoryCache,\
+-	com.tgt.KeywordSearchApplication,com.tgt.search.features.*,\
+-	com.tgt.KeywordSearchApplication.JsonpAdvice,com.tgt.search.spellcheck*,\
+-	com.tgt.search.classifier.MultiClassifierBoostPredictions,com.tgt.search.entity.MicroServicesResponse,\
+-	com.tgt.search.facetranking.FacetsList,com.tgt.search.facetranking.FacetData,com.tgt.search.facetranking.FacetRankResponse,\
+-	com.tgt.search.classifier.MultiClassifierResponse,com.tgt.search.component.MMClassifier,\
+-	com.tgt.search.concurrency.SpellRulesClassifierASyncService,\
+-	com.tgt.search.builder.solrquery.StoresParamBuilder,com.tgt.search.lnr.*,com.tgt.search.classifier.ClassifierService,\
+-	com.tgt.search.builder.solrquery.FilterParamBuilder,com.tgt.search.metrics.*,com.tgt.search.config.*,\
+-	com.tgt.search.filter.*,com.tgt.search.facade.KeywordSearchFacadeImpl,com.tgt.search.component.SpellRulesFacetClassifierResponseBuilder,\
+-	com.tgt.search.cache.*,com.tgt.search.rest.resource.SystemResource,com.tgt.search.rest.resource.CacheStatsResource,\
+-	com.tgt.search.edabi.*,com.tgt.search.utils.*,com.tgt.search.builder.solrquery.FilterStrategy,com.tgt.search.builder.AuditStreamBuilder
+-version=0.3.2
+\ No newline at end of file
++excludeCodeCoverageClasses=
++version=0.3.2
+diff --git a/category-search/src/main/java/com/tgt/CategorySearchApplication.java b/category-search/src/main/java/com/tgt/CategorySearchApplication.java
+index bf7d601..a3827e9 100755
+--- a/category-search/src/main/java/com/tgt/CategorySearchApplication.java
++++ b/category-search/src/main/java/com/tgt/CategorySearchApplication.java
+@@ -49,0 +50,3 @@ public class CategorySearchApplication extends SpringBootServletInitializer {
++    counter++
++
++    System.out.print("Soemthing");
+@@ -70 +71,0 @@ public class CategorySearchApplication extends SpringBootServletInitializer {
+-
+diff --git a/category-search/src/main/java/com/tgt/SomethingElse.java b/category-search/src/main/java/com/tgt/SomethingElse.java
+index bf7d601..a3827e9 100755
+--- a/category-search/src/main/java/com/tgt/SomethingElse.java
++++ b/category-search/src/main/java/com/tgt/SomethingElse.java
+@@ -49,0 +50 @@
++    System.out.print("Soemthing 2");
+@@ -70 +71,0 @@
+-
+diff --git a/category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt b/category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt
+index bf7d601..a3827e9 100755
+--- a/category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt
++++ b/category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt
+@@ -3,0 +4,3 @@
++    counter++
++    doingSomething();
++    System.out.print("Soemthing");
+@@ -9,0 +10,3 @@
++    counter2++
++    doingSomething2();
++    System.out.print("Soemthing2");

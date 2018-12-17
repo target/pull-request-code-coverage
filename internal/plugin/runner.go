@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"fmt"
 	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/calculator"
 	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage"
 	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/cobertura"
@@ -12,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"io"
+	"strings"
 )
 
 type DefaultRunner struct{}
@@ -24,19 +26,27 @@ func NewRunner() *DefaultRunner {
 //nolint: gocyclo
 func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSourceLinesSource io.Reader, reportDefaultOut io.Writer) error {
 
-	coverageFile, found := propertyGetter("PLUGIN_COVERAGE_FILE")
+	rawSourceDirs, found := propertyGetter("PLUGIN_SOURCE_DIRS")
 	if !found {
-		return errors.New("Missing property PLUGIN_COVERAGE_FILE")
+		return errors.New("Missing property PLUGIN_SOURCE_DIRS")
 	}
+	logrus.Info(fmt.Sprintf("PLUGIN_SOURCE_DIRS set to %v", rawSourceDirs))
+
+	sourceDirs := parseSourceDirs(rawSourceDirs)
 
 	coverageType, found := propertyGetter("PLUGIN_COVERAGE_TYPE")
 	if !found {
 		return errors.New("Missing property PLUGIN_COVERAGE_TYPE")
 	}
 
-	sourceDir, found := propertyGetter("PLUGIN_SOURCE_DIR")
+	loader, getLoaderErr := getCoverageReportLoader(coverageType, sourceDirs)
+	if getLoaderErr != nil {
+		return errors.Wrap(getLoaderErr, "Failed opening coverage loader")
+	}
+
+	coverageFile, found := propertyGetter("PLUGIN_COVERAGE_FILE")
 	if !found {
-		return errors.New("Missing property PLUGIN_SOURCE_DIR")
+		return errors.New("Missing property PLUGIN_COVERAGE_FILE")
 	}
 
 	module, found := propertyGetter("PLUGIN_MODULE")
@@ -70,12 +80,12 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 		logrus.Info("DRONE_REPO_NAME was missing, will not send report to PR comments")
 	}
 
-	coverageReport, loadCoverageErr := GetCoverageReportLoader(coverageType, sourceDir).Load(coverageFile)
+	coverageReport, loadCoverageErr := loader.Load(coverageFile)
 	if loadCoverageErr != nil {
 		return errors.Wrap(loadCoverageErr, "Failed loading coverage report")
 	}
 
-	changedLines, changedLinesErr := unifieddiff.NewChangedSourceLinesLoader(module, sourceDir).Load(changedSourceLinesSource)
+	changedLines, changedLinesErr := unifieddiff.NewChangedSourceLinesLoader(module, sourceDirs).Load(changedSourceLinesSource)
 	if changedLinesErr != nil {
 		return errors.Wrap(changedLinesErr, "Failed loading changed lines")
 	}
@@ -94,12 +104,27 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 	return reporter.NewForking(reporters).Write(changedLinesWithCoverage)
 }
 
-func GetCoverageReportLoader(coverageType string, sourceDir string) coverage.Loader {
+func parseSourceDirs(rawSourceDirStr string) []string {
+	rawSourceDirs := strings.Split(rawSourceDirStr, ",")
+	resultSoruceDirs := make([]string, len(rawSourceDirs))
+
+	for idx, rs := range rawSourceDirs {
+		resultSoruceDirs[idx] = strings.TrimSpace(rs)
+	}
+
+	return resultSoruceDirs
+}
+
+func getCoverageReportLoader(coverageType string, sourceDirs []string) (coverage.Loader, error) {
 	switch coverageType {
 	case "cobertura":
-		return cobertura.NewReportLoader(sourceDir)
+		if len(sourceDirs) != 1 {
+			return nil, errors.Errorf("Currently not supporting multiple source dirs with cobertura coverage report type.")
+		}
+
+		return cobertura.NewReportLoader(sourceDirs[0]), nil
 	default:
-		return jacoco.NewReportLoader()
+		return jacoco.NewReportLoader(), nil
 	}
 
 }

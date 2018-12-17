@@ -17,7 +17,10 @@ func TestDefaultRunner_RunNotFoundProps(t *testing.T) {
 		expectedMsg  string
 	}{
 		{
-			foundProps: map[string]string{},
+			foundProps: map[string]string{
+				"PLUGIN_SOURCE_DIRS":   "something",
+				"PLUGIN_COVERAGE_TYPE": "something",
+			},
 			missingProps: []string{
 				"PLUGIN_COVERAGE_FILE",
 			},
@@ -25,7 +28,7 @@ func TestDefaultRunner_RunNotFoundProps(t *testing.T) {
 		},
 		{
 			foundProps: map[string]string{
-				"PLUGIN_COVERAGE_FILE": "abc",
+				"PLUGIN_SOURCE_DIRS": "something",
 			},
 			missingProps: []string{
 				"PLUGIN_COVERAGE_TYPE",
@@ -33,14 +36,11 @@ func TestDefaultRunner_RunNotFoundProps(t *testing.T) {
 			expectedMsg: "Missing property PLUGIN_COVERAGE_TYPE",
 		},
 		{
-			foundProps: map[string]string{
-				"PLUGIN_COVERAGE_FILE": "abc",
-				"PLUGIN_COVERAGE_TYPE": "jacoco",
-			},
+			foundProps: map[string]string{},
 			missingProps: []string{
-				"PLUGIN_SOURCE_DIR",
+				"PLUGIN_SOURCE_DIRS",
 			},
-			expectedMsg: "Missing property PLUGIN_SOURCE_DIR",
+			expectedMsg: "Missing property PLUGIN_SOURCE_DIRS",
 		},
 	}
 
@@ -72,7 +72,7 @@ func TestDefaultRunner_Run_GoExample(t *testing.T) {
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/example_go_coverage.xml", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("cobertura", true)
 		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("", false)
-		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("/go/git.target.com/search-product-team/pull-request-code-coverage", true)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("/go/git.target.com/search-product-team/pull-request-code-coverage", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
 		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("123", true)
@@ -124,7 +124,7 @@ func TestDefaultRunner_Run(t *testing.T) {
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
 		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("123", true)
@@ -161,6 +161,54 @@ Covered Instructions        -> **73%** (8)
 	})
 }
 
+func TestDefaultRunner_Run_2_Source_Dirs(t *testing.T) {
+
+	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
+
+		propGetter := mocks.NewMockPropertyGetter()
+
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport_2_source_dirs.xml", true)
+		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java, src/main/kotlin", true)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
+		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("123", true)
+		propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("some_org", true)
+		propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("some_repo", true)
+
+		var buf bytes.Buffer
+
+		err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified_2_source_dirs.diff"), &buf)
+		assert.NoError(t, err)
+
+		assert.Equal(t, `Missed Instructions:
+--- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
+    System.out.print("Soemthing");
+--- category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12
+    System.out.print("Soemthing2");
+
+Code Coverage Summary:
+Lines Without Coverage Data -> 47% (7)
+Lines With Coverage Data    -> 53% (8)
+Covered Instructions        -> 88% (42)
+Missed Instructions         -> 12% (6)
+`, buf.String())
+
+		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+			"body": `*Modules: category-search*
+
+Code Coverage Summary:
+
+Lines With Coverage Data    -> 53% (8)
+Covered Instructions        -> **88%** (42)
+`,
+		})
+
+		propGetter.AssertExpectations(t)
+	})
+}
+
 func TestDefaultRunner_Run_NoChanges(t *testing.T) {
 
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
@@ -170,7 +218,7 @@ func TestDefaultRunner_Run_NoChanges(t *testing.T) {
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReportEmpty.xml", true)
 		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
 		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("123", true)
@@ -203,7 +251,7 @@ func TestDefaultRunner_RunNoCoverageData(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestEmptyReport.xml", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -246,7 +294,7 @@ func TestDefaultRunner_RunFirstNodeIsNotModule(t *testing.T) {
 			propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 			propGetter.On("GetProperty", "PLUGIN_MODULE").Return(tt.rawPluginDiffFirstNodeIsModule, tt.foundPluginDiffFirstNodeIsModule)
 			propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-			propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+			propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 			propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 			propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 			propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -279,7 +327,7 @@ func TestDefaultRunner_RunErrOpeningCoverFile(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/blahblah.xml", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("anything", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("anything", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -298,7 +346,7 @@ func TestDefaultRunner_RunBadUnified_UnfinishedBlock(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -319,7 +367,7 @@ func TestDefaultRunner_RunBadUnified_UnfinishedBlock2(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -340,7 +388,7 @@ func TestDefaultRunner_RunBadUnified_BadFilename(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -361,7 +409,7 @@ func TestDefaultRunner_RunBadUnified_ExtraLinesBlock(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -382,7 +430,7 @@ func TestDefaultRunner_RunBadUnified_AlphaInAtBlock(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -403,7 +451,7 @@ func TestDefaultRunner_RunBadUnified_AlphaInAtBlock2(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -424,7 +472,7 @@ func TestDefaultRunner_RunCoverageNotXml(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.json", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("src/main/java", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
@@ -435,6 +483,20 @@ func TestDefaultRunner_RunCoverageNotXml(t *testing.T) {
 
 	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified.diff"), &buf)
 	assert.EqualError(t, err, "Failed loading coverage report: Failed unmarshalling coverage file ../test/jacocoTestReport.json: EOF")
+
+	propGetter.AssertExpectations(t)
+}
+
+func TestDefaultRunner_Run_2SourceDirsCobertura(t *testing.T) {
+	propGetter := mocks.NewMockPropertyGetter()
+
+	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("cobertura", true)
+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java,src/main/kotlin", true)
+
+	var buf bytes.Buffer
+
+	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified.diff"), &buf)
+	assert.EqualError(t, err, "Failed opening coverage loader: Currently not supporting multiple source dirs with cobertura coverage report type.")
 
 	propGetter.AssertExpectations(t)
 }
