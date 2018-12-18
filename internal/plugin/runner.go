@@ -90,10 +90,7 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 		return errors.Wrap(changedLinesErr, "Failed loading changed lines")
 	}
 
-	changedLinesWithCoverage, determineCoverageErr := calculator.NewCoverage().DetermineCoverage(changedLines, coverageReport)
-	if determineCoverageErr != nil {
-		return errors.Wrap(determineCoverageErr, "Failed determining overall coverage for changed lines")
-	}
+	changedLinesWithCoverage := calculator.NewCoverage().DetermineCoverage(changedLines, coverageReport)
 
 	reporters := []reporter.Reporter{reporter.NewSimple(reportDefaultOut)}
 

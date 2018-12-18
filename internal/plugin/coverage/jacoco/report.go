@@ -53,12 +53,7 @@ func silentlyCall(c func() error) {
 type Report struct {
 	XMLName xml.Name `xml:"report"`
 
-	ReportName string    `xml:"name,attr"`
-	Packages   []Package `xml:"package"`
-}
-
-func (r *Report) Name() string {
-	return r.ReportName
+	Packages []Package `xml:"package"`
 }
 
 func (r *Report) GetCoverageData(_ string, _ string, pkg string, fileName string, lineNumber int) (*domain.CoverageData, bool) {

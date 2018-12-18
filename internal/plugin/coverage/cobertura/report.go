@@ -59,12 +59,7 @@ type Report struct {
 	XMLName xml.Name `xml:"coverage"`
 
 	sourceDir        string
-	ReportName       string           `xml:"name,attr"`
 	PackageContainer PackageContainer `xml:"packages"`
-}
-
-func (r *Report) Name() string {
-	return r.ReportName
 }
 
 func (r *Report) GetCoverageData(_ string, srcDir string, pkg string, fileName string, lineNumber int) (*domain.CoverageData, bool) {

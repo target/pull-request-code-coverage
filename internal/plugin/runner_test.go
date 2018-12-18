@@ -275,42 +275,6 @@ Missed Instructions         -> 0% (0)
 	propGetter.AssertExpectations(t)
 }
 
-func TestDefaultRunner_RunFirstNodeIsNotModule(t *testing.T) {
-
-	tts := []struct {
-		rawPluginDiffFirstNodeIsModule   string
-		foundPluginDiffFirstNodeIsModule bool
-	}{
-		{
-			rawPluginDiffFirstNodeIsModule:   "",
-			foundPluginDiffFirstNodeIsModule: false,
-		},
-	}
-
-	for idx, tt := range tts {
-		t.Run(strconv.Itoa(idx), func(t *testing.T) {
-			propGetter := mocks.NewMockPropertyGetter()
-
-			propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
-			propGetter.On("GetProperty", "PLUGIN_MODULE").Return(tt.rawPluginDiffFirstNodeIsModule, tt.foundPluginDiffFirstNodeIsModule)
-			propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
-			propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
-			propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
-			propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
-			propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
-			propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
-			propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
-
-			var buf bytes.Buffer
-
-			err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified.diff"), &buf)
-			assert.EqualError(t, err, "Failed determining overall coverage for changed lines: Coverage report  did not match the module category-search")
-
-			propGetter.AssertExpectations(t)
-		})
-	}
-}
-
 func MustOpen(t *testing.T, filename string) *os.File {
 	f, err := os.Open(filename)
 

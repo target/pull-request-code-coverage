@@ -8,5 +8,4 @@ type Loader interface {
 
 type Report interface {
 	GetCoverageData(module string, sourceDir string, pkg string, fileName string, lineNumber int) (*domain.CoverageData, bool)
-	Name() string
 }
