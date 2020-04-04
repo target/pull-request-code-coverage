@@ -71,3 +71,11 @@ pipeline:
     tags:
     - latest
     - "1-${DRONE_COMMIT:0:7}"
+
+secrets:
+  pull_request_api_key:
+    path: /secret/org/search-product-team/pull_request_api_key
+  docker_username:
+    path: /secret/org/search-product-team/docker_username
+  docker_password:
+    path: /secret/org/search-product-team/docker_password
