@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"io"
+	"strconv"
 	"strings"
 )
 
@@ -88,6 +89,22 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 	changedLines, changedLinesErr := unifieddiff.NewChangedSourceLinesLoader(module, sourceDirs).Load(changedSourceLinesSource)
 	if changedLinesErr != nil {
 		return errors.Wrap(changedLinesErr, "Failed loading changed lines")
+	}
+
+	debugStr, found := propertyGetter("PLUGIN_DEBUG")
+	if !found {
+		logrus.Info("PLUGIN_DEBUG was missing defaulting to false")
+		debugStr = "false"
+	}
+
+	debug, parseDebugErr := strconv.ParseBool(debugStr)
+	if parseDebugErr != nil {
+		logrus.Info("PLUGIN_DEBUG was invalid, defaulting to false")
+		debug = false
+	}
+
+	if debug {
+		logrus.SetLevel(logrus.DebugLevel)
 	}
 
 	changedLinesWithCoverage := calculator.NewCoverage().DetermineCoverage(changedLines, coverageReport)

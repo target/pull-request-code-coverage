@@ -5,6 +5,7 @@ import (
 	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage"
 	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"log"
@@ -44,6 +45,16 @@ func (l *DefaultLoader) Load(coverageFile string) (coverage.Report, error) {
 		return nil, errors.Wrapf(err, "Failed unmarshalling coverage file %v", coverageFile)
 	}
 
+	if len(coverageReport.ReportSources.Sources) > 1 {
+		return nil, errors.Errorf("Cannot process report with more than 1 source: %v", coverageReport.ReportSources.Sources)
+	}
+
+	if len(coverageReport.ReportSources.Sources) == 1 {
+		coverageReport.classSourceDir = coverageReport.ReportSources.Sources[0]
+	} else {
+		coverageReport.classSourceDir = ""
+	}
+
 	coverageReport.sourceDir = l.sourceDir
 
 	return &coverageReport, nil
@@ -58,7 +69,10 @@ func silentlyCall(c func() error) {
 type Report struct {
 	XMLName xml.Name `xml:"coverage"`
 
-	sourceDir        string
+	sourceDir      string
+	classSourceDir string
+
+	ReportSources    ReportSources    `xml:"sources"`
 	PackageContainer PackageContainer `xml:"packages"`
 }
 
@@ -68,19 +82,21 @@ func (r *Report) GetCoverageData(_ string, srcDir string, pkg string, fileName s
 		r.sourceDir, srcDir, pkg, fileName,
 	}
 
-	desiredFileNameParts := []string{}
-	for _, part := range rawDesiredFileNameParts {
-		if len(part) > 0 {
-			desiredFileNameParts = append(desiredFileNameParts, part)
-		}
-	}
+	logrus.Debugf("looking for file %v", rawDesiredFileNameParts)
 
-	desiredFileName := strings.Join(desiredFileNameParts, "/")
+	desiredFileName := strings.Join(withoutEmpty(rawDesiredFileNameParts), "/")
+	logrus.Debugf("looking for file %v", desiredFileName)
 
 	for _, p := range r.PackageContainer.Packages {
 
 		for _, c := range p.ClassesContainer.Classes {
-			if c.Filename == desiredFileName {
+
+			classFilename := strings.Join(withoutEmpty([]string{r.classSourceDir, c.Filename}), "/")
+
+			matches := classFilename == desiredFileName
+			logrus.Debugf("%v == %v => %v", classFilename, desiredFileName, matches)
+
+			if matches {
 				for _, l := range c.LinesContainer.Lines {
 					if l.Number == lineNumber {
 
@@ -102,6 +118,22 @@ func (r *Report) GetCoverageData(_ string, srcDir string, pkg string, fileName s
 	}
 
 	return nil, false
+}
+
+func withoutEmpty(parts []string) []string {
+	var result []string
+	for _, part := range parts {
+		if len(part) > 0 {
+			result = append(result, part)
+		}
+	}
+	return result
+}
+
+type ReportSources struct {
+	XMLName xml.Name `xml:"sources"`
+
+	Sources []string `xml:"source"`
 }
 
 type PackageContainer struct {

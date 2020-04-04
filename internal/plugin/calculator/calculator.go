@@ -3,6 +3,7 @@ package calculator
 import (
 	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage"
 	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
+	"github.com/sirupsen/logrus"
 )
 
 type Coverage interface {
@@ -23,11 +24,13 @@ func (*DefaultCoverage) DetermineCoverage(changedLines []domain.SourceLine, cove
 		coverageData, found := coverageReport.GetCoverageData(sl.Module, sl.SrcDir, sl.Pkg, sl.FileName, sl.LineNumber)
 
 		if found {
+			logrus.Debugf("%v found: %v", sl, coverageData)
 			result = append(result, domain.SourceLineCoverage{
 				SourceLine:   sl,
 				CoverageData: *coverageData,
 			})
 		} else {
+			logrus.Debugf("%v not found", sl)
 			result = append(result, domain.SourceLineCoverage{
 				SourceLine:   sl,
 				CoverageData: domain.CoverageData{},

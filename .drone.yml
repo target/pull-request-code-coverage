@@ -13,6 +13,7 @@ build: &build
   - go test -v -coverpkg=./... -coverprofile=coverage.txt ./...
   - go tool cover -func=coverage.txt
   - gocov convert coverage.txt | gocov-xml > ./coverage.xml
+  - cat ./coverage.xml
   - ./bin/lint.sh
   - go build -a -installsuffix cgo -o plugin .
 
@@ -24,6 +25,7 @@ check-pr-code-coverage: &check-pr-code-coverage
   - PLUGIN_SOURCE_DIRS=/go/src/git.target.com/search-product-team/pull-request-code-coverage
   - PLUGIN_RUN_DIR=.
   - PLUGIN_GH_API_BASE_URL=https://git.target.com
+  - PLUGIN_DEBUG=true
   secrets:
   - source: pull_request_api_key
     target: plugin_gh_api_key

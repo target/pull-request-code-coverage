@@ -64,11 +64,64 @@ func TestDefaultRunner_RunNotFoundProps(t *testing.T) {
 	}
 }
 
+func TestDefaultRunner_Run_GoExample_WithSourceDir(t *testing.T) {
+
+	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
+		propGetter := mocks.NewMockPropertyGetter()
+
+		propGetter.On("GetProperty", "PLUGIN_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/example_go_coverage_with_source_dir.xml", true)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("cobertura", true)
+		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("/go/git.target.com/search-product-team/pull-request-code-coverage", true)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
+		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("123", true)
+		propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("some_org", true)
+		propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("some_repo", true)
+
+		var buf bytes.Buffer
+
+		err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/example_go_unified.diff"), &buf)
+		assert.NoError(t, err)
+
+		assert.Equal(t, `Missed Instructions:
+--- internal/plugin/runner.go:72
+func GetCoverageReportLoader(coverageType string, sourceDir string) coverage.Loader {
+--- main.go:10
+	err := plugin.NewRunner().Run(os.LookupEnv, os.Stdin, os.Stdout)
+--- main.go:12
+	if err != nil {
+--- main.go:13
+		log.WithFields(log.Fields{
+--- main.go:17
+		os.Exit(1)
+
+Code Coverage Summary:
+Lines Without Coverage Data -> 92% (2216)
+Lines With Coverage Data    -> 8% (182)
+Covered Instructions        -> 97% (177)
+Missed Instructions         -> 3% (5)
+`, buf.String())
+
+		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+			"body": `Code Coverage Summary:
+
+Lines With Coverage Data    -> 8% (182)
+Covered Instructions        -> **97%** (177)
+`,
+		})
+
+		propGetter.AssertExpectations(t)
+	})
+}
+
 func TestDefaultRunner_Run_GoExample(t *testing.T) {
 
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 		propGetter := mocks.NewMockPropertyGetter()
 
+		propGetter.On("GetProperty", "PLUGIN_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/example_go_coverage.xml", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("cobertura", true)
 		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("", false)
@@ -121,6 +174,7 @@ func TestDefaultRunner_Run(t *testing.T) {
 
 		propGetter := mocks.NewMockPropertyGetter()
 
+		propGetter.On("GetProperty", "PLUGIN_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
@@ -167,6 +221,7 @@ func TestDefaultRunner_Run_2_Source_Dirs(t *testing.T) {
 
 		propGetter := mocks.NewMockPropertyGetter()
 
+		propGetter.On("GetProperty", "PLUGIN_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReport_2_source_dirs.xml", true)
 		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
@@ -215,6 +270,7 @@ func TestDefaultRunner_Run_NoChanges(t *testing.T) {
 
 		propGetter := mocks.NewMockPropertyGetter()
 
+		propGetter.On("GetProperty", "PLUGIN_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestReportEmpty.xml", true)
 		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
@@ -248,6 +304,7 @@ Missed Instructions         -> 0% (0)
 func TestDefaultRunner_RunNoCoverageData(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
 
+	propGetter.On("GetProperty", "PLUGIN_DEBUG").Return("false", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/jacocoTestEmptyReport.xml", true)
 	propGetter.On("GetProperty", "PLUGIN_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
