@@ -27,17 +27,17 @@ func NewRunner() *DefaultRunner {
 //nolint: gocyclo
 func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSourceLinesSource io.Reader, reportDefaultOut io.Writer) error {
 
-	rawSourceDirs, found := propertyGetter("PLUGIN_SOURCE_DIRS")
+	rawSourceDirs, found := getActiveEnvVariable(propertyGetter, "PLUGIN_SOURCE_DIRS", "PARAMETER_SOURCE_DIRS")
 	if !found {
-		return errors.New("Missing property PLUGIN_SOURCE_DIRS")
+		return errors.New("Missing property PARAMETER_SOURCE_DIRS")
 	}
 	logrus.Info(fmt.Sprintf("PLUGIN_SOURCE_DIRS set to %v", rawSourceDirs))
 
 	sourceDirs := parseSourceDirs(rawSourceDirs)
 
-	coverageType, found := propertyGetter("PLUGIN_COVERAGE_TYPE")
+	coverageType, found := getActiveEnvVariable(propertyGetter, "PLUGIN_COVERAGE_TYPE", "PARAMETER_COVERAGE_TYPE")
 	if !found {
-		return errors.New("Missing property PLUGIN_COVERAGE_TYPE")
+		return errors.New("Missing property PARAMETER_COVERAGE_TYPE")
 	}
 
 	loader, getLoaderErr := getCoverageReportLoader(coverageType, sourceDirs)
@@ -45,42 +45,39 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 		return errors.Wrap(getLoaderErr, "Failed opening coverage loader")
 	}
 
-	coverageFile, found := propertyGetter("PLUGIN_COVERAGE_FILE")
+	coverageFile, found := getActiveEnvVariable(propertyGetter, "PLUGIN_COVERAGE_FILE", "PARAMETER_COVERAGE_FILE")
 	if !found {
-		return errors.New("Missing property PLUGIN_COVERAGE_FILE")
+		return errors.New("Missing property PARAMETER_COVERAGE_FILE")
 	}
 
-	module, found := propertyGetter("PLUGIN_MODULE")
+	module, found := getActiveEnvVariable(propertyGetter, "PLUGIN_MODULE", "PARAMETER_MODULE")
 	if !found {
-		logrus.Info("PLUGIN_MODULE was missing defaulting to false")
+		logrus.Info("PARAMETER_MODULE was missing defaulting to false")
 		module = ""
 	}
 
-	ghAPIKey, ghAPIKeyFound := propertyGetter("PLUGIN_GH_API_KEY")
+	ghAPIKey, ghAPIKeyFound := getActiveEnvVariable(propertyGetter, "PLUGIN_GH_API_KEY", "PARAMETER_GH_API_KEY")
 	if !ghAPIKeyFound {
-		logrus.Info("PLUGIN_GH_API_KEY was missing, will not send report to PR comments")
+		logrus.Info("PARAMETER_GH_API_KEY was missing, will not send report to PR comments")
 	}
 
-	ghAPIBaseURL, ghAPIBaseURLFound := propertyGetter("PLUGIN_GH_API_BASE_URL")
+	ghAPIBaseURL, ghAPIBaseURLFound := getActiveEnvVariable(propertyGetter, "PLUGIN_GH_API_BASE_URL", "PARAMETER_GH_API_BASE_URL")
 	if !ghAPIBaseURLFound {
-		logrus.Info("PLUGIN_GH_API_BASE_URL was missing, will not send report to PR comments")
+		logrus.Info("PARAMETER_GH_API_BASE_URL was missing, will not send report to PR comments")
 	}
 
-	dronePR, dronePRFound := propertyGetter("DRONE_PULL_REQUEST")
-	if !dronePRFound {
-		logrus.Info("DRONE_PULL_REQUEST was missing, will not send report to PR comments")
+	repoPR, repoPRFound := getActiveEnvVariable(propertyGetter, "DRONE_PULL_REQUEST", "BUILD_PULL_REQUEST_NUMBER")
+	if !repoPRFound {
+		logrus.Info("BUILD_PULL_REQUEST_NUMBER was missing, will not send report to PR comments")
 	}
-
-	droneOwner, droneOwnerFound := propertyGetter("DRONE_REPO_OWNER")
-	if !droneOwnerFound {
-		logrus.Info("DRONE_REPO_OWNER was missing, will not send report to PR comments")
+	repoOwner, repoOwnerFound := getActiveEnvVariable(propertyGetter, "DRONE_REPO_OWNER", "REPOSITORY_ORG")
+	if !repoOwnerFound {
+		logrus.Info("REPOSITORY_ORG was missing, will not send report to PR comments")
 	}
-
-	droneRepo, droneRepoFound := propertyGetter("DRONE_REPO_NAME")
-	if !droneRepoFound {
-		logrus.Info("DRONE_REPO_NAME was missing, will not send report to PR comments")
+	repoName, repoNameFound := getActiveEnvVariable(propertyGetter, "DRONE_REPO_NAME", "REPOSITORY_NAME")
+	if !repoNameFound {
+		logrus.Info("REPOSITORY_NAME was missing, will not send report to PR comments")
 	}
-
 	coverageReport, loadCoverageErr := loader.Load(coverageFile)
 	if loadCoverageErr != nil {
 		return errors.Wrap(loadCoverageErr, "Failed loading coverage report")
@@ -91,7 +88,7 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 		return errors.Wrap(changedLinesErr, "Failed loading changed lines")
 	}
 
-	debugStr, found := propertyGetter("PLUGIN_DEBUG")
+	debugStr, found := getActiveEnvVariable(propertyGetter, "PLUGIN_DEBUG", "PARAMETER_DEBUG")
 	if !found {
 		logrus.Info("PLUGIN_DEBUG was missing defaulting to false")
 		debugStr = "false"
@@ -111,10 +108,9 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 
 	reporters := []reporter.Reporter{reporter.NewSimple(reportDefaultOut)}
 
-	if ghAPIKeyFound && ghAPIBaseURLFound && dronePRFound && droneOwnerFound && droneRepoFound {
-		reporters = append(reporters, reporter.NewGithubPullRequest(ghAPIKey, ghAPIBaseURL, dronePR, droneOwner, droneRepo, &pluginhttp.DefaultClient{}, &pluginjson.DefaultClient{}))
+	if ghAPIKeyFound && ghAPIBaseURLFound && repoPRFound && repoOwnerFound && repoNameFound {
+		reporters = append(reporters, reporter.NewGithubPullRequest(ghAPIKey, ghAPIBaseURL, repoPR, repoOwner, repoName, &pluginhttp.DefaultClient{}, &pluginjson.DefaultClient{}))
 	}
-
 	return reporter.NewForking(reporters).Write(changedLinesWithCoverage)
 }
 
@@ -141,4 +137,12 @@ func getCoverageReportLoader(coverageType string, sourceDirs []string) (coverage
 		return jacoco.NewReportLoader(), nil
 	}
 
+}
+
+func getActiveEnvVariable(propertyGetter func(string) (string, bool), droneVar, velaVar string) (string, bool) {
+	value, droneVarFound := propertyGetter(droneVar)
+	if !droneVarFound {
+		return propertyGetter(velaVar)
+	}
+	return value, droneVarFound
 }

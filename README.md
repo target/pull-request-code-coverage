@@ -9,7 +9,30 @@ lines.
 This plugin will output the coverage details to the drone step's console, as well as has the ability to comment on the 
 PR with a summary of the coverage details.
 
-## Usage
+
+
+## VELA Usage
+
+```yaml
+- name: check-pr-code-coverage
+   image: docker.target.com/search/pull-request-code-coverage
+   pull: true
+   ruleset:
+     event: [pull_request]
+   parameters:
+     coverage_type: jacoco
+     coverage_file: some-sub-module/build/reports/jacoco/test/jacocoTestReport.xml
+     source_dirs:
+       - src/main/java
+       - src/main/kotlin
+     gh_api_base_url: https://git.target.com
+     module: some-sub-module
+   secrets:
+     - source: pull_request_api_key
+       target: plugin_gh_api_key
+```
+
+## DRONE Usage
 
 ```yaml
 check-pr-code-coverage:
@@ -28,6 +51,8 @@ check-pr-code-coverage:
   - source: pull_request_api_key
     target: plugin_gh_api_key
 ```
+
+
 
 #### Parameters
 

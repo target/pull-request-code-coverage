@@ -2,24 +2,41 @@
 
 set -Eeuo pipefail
 
+get_env_var () {
+    if [ -z "$1" ]
+    then
+        echo "$2"
+    fi
+    echo "$1"
+}
+
+netrcMachine="$(get_env_var "${DRONE_NETRC_MACHINE:-}" "${VELA_NETRC_MACHINE:-}")"
+netrcUsername="$(get_env_var "${DRONE_NETRC_USERNAME:-}" "${VELA_NETRC_USERNAME:-}")"
+netrcPassword="$(get_env_var "${DRONE_NETRC_PASSWORD:-}" "${VELA_NETRC_PASSWORD:-}")"
+
+
+
 if [[ ! -f ~/.netrc ]]
 then
     echo "~/.netrc does not exist, creating..."
+
     cat >~/.netrc <<EOF
-machine $DRONE_NETRC_MACHINE
-login $DRONE_NETRC_USERNAME
-password $DRONE_NETRC_PASSWORD
+machine $netrcMachine
+login $netrcUsername
+password $netrcPassword
 EOF
 fi
+
 
 set -x
 
 PLUGIN_MODULE="${PLUGIN_MODULE:-}"
 PLUGIN_RUN_DIR="${PLUGIN_RUN_DIR:-}"
+branch="$(get_env_var "${DRONE_BRANCH:-}" "${REPOSITORY_BRANCH:-}")"
 
 git config --global user.name "drone"
 git config --global user.email "drone@drone.shipt.com"
 
-git fetch --no-tags origin $DRONE_BRANCH
 
-git --no-pager diff --unified=0 origin/$DRONE_BRANCH $PLUGIN_MODULE | $PLUGIN_RUN_DIR/plugin
+git fetch --no-tags origin  $branch
+git --no-pager diff --unified=0 origin/$branch $PLUGIN_MODULE | $PLUGIN_RUN_DIR/plugin

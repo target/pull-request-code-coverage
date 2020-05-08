@@ -22,9 +22,10 @@ func TestDefaultRunner_RunNotFoundProps(t *testing.T) {
 				"PLUGIN_COVERAGE_TYPE": "something",
 			},
 			missingProps: []string{
+				"PARAMETER_COVERAGE_FILE",
 				"PLUGIN_COVERAGE_FILE",
 			},
-			expectedMsg: "Missing property PLUGIN_COVERAGE_FILE",
+			expectedMsg: "Missing property PARAMETER_COVERAGE_FILE",
 		},
 		{
 			foundProps: map[string]string{
@@ -32,15 +33,17 @@ func TestDefaultRunner_RunNotFoundProps(t *testing.T) {
 			},
 			missingProps: []string{
 				"PLUGIN_COVERAGE_TYPE",
+				"PARAMETER_COVERAGE_TYPE",
 			},
-			expectedMsg: "Missing property PLUGIN_COVERAGE_TYPE",
+			expectedMsg: "Missing property PARAMETER_COVERAGE_TYPE",
 		},
 		{
 			foundProps: map[string]string{},
 			missingProps: []string{
 				"PLUGIN_SOURCE_DIRS",
+				"PARAMETER_SOURCE_DIRS",
 			},
-			expectedMsg: "Missing property PLUGIN_SOURCE_DIRS",
+			expectedMsg: "Missing property PARAMETER_SOURCE_DIRS",
 		},
 	}
 
@@ -76,6 +79,7 @@ func TestDefaultRunner_Run_GoExample_WithSourceDir(t *testing.T) {
 		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("/go/git.target.com/search-product-team/pull-request-code-coverage", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
+		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
 		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("123", true)
 		propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("some_org", true)
 		propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("some_repo", true)
@@ -128,6 +132,7 @@ func TestDefaultRunner_Run_GoExample(t *testing.T) {
 		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("/go/git.target.com/search-product-team/pull-request-code-coverage", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
+		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
 		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("123", true)
 		propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("some_org", true)
 		propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("some_repo", true)
@@ -184,6 +189,62 @@ func TestDefaultRunner_Run(t *testing.T) {
 		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("123", true)
 		propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("some_org", true)
 		propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("some_repo", true)
+		var buf bytes.Buffer
+
+		err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified.diff"), &buf)
+		assert.NoError(t, err)
+
+		assert.Equal(t, `Missed Instructions:
+--- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
+    System.out.print("Soemthing");
+
+Code Coverage Summary:
+Lines Without Coverage Data -> 78% (7)
+Lines With Coverage Data    -> 22% (2)
+Covered Instructions        -> 73% (8)
+Missed Instructions         -> 27% (3)
+`, buf.String())
+
+		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+			"body": `*Modules: category-search*
+
+Code Coverage Summary:
+
+Lines With Coverage Data    -> 22% (2)
+Covered Instructions        -> **73%** (8)
+`,
+		})
+
+		propGetter.AssertExpectations(t)
+	})
+}
+
+func TestDefaultRunner_Run_Vela(t *testing.T) {
+
+	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
+
+		propGetter := mocks.NewMockPropertyGetter()
+
+		propGetter.On("GetProperty", "PLUGIN_DEBUG").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
+		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
+		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
+		propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("src/main/java", true)
+		propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("SOME_API_KEY", true)
+		propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return(mockServerURL, true)
+		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
+		propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("123", true)
+		propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
+		propGetter.On("GetProperty", "REPOSITORY_ORG").Return("some_org", true)
+		propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
+		propGetter.On("GetProperty", "REPOSITORY_NAME").Return("some_repo", true)
 
 		var buf bytes.Buffer
 
@@ -264,6 +325,67 @@ Covered Instructions        -> **88%** (42)
 	})
 }
 
+func TestDefaultRunner_Run_2_Source_Dirs_Vela(t *testing.T) {
+
+	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
+
+		propGetter := mocks.NewMockPropertyGetter()
+
+		propGetter.On("GetProperty", "PLUGIN_DEBUG").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+
+		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport_2_source_dirs.xml", true)
+		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
+		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
+		propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("src/main/java, src/main/kotlin", true)
+		propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("SOME_API_KEY", true)
+		propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return(mockServerURL, true)
+
+		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
+		propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("123", true)
+		propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
+		propGetter.On("GetProperty", "REPOSITORY_ORG").Return("some_org", true)
+		propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
+		propGetter.On("GetProperty", "REPOSITORY_NAME").Return("some_repo", true)
+
+		var buf bytes.Buffer
+
+		err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified_2_source_dirs.diff"), &buf)
+		assert.NoError(t, err)
+
+		assert.Equal(t, `Missed Instructions:
+--- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
+    System.out.print("Soemthing");
+--- category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12
+    System.out.print("Soemthing2");
+
+Code Coverage Summary:
+Lines Without Coverage Data -> 47% (7)
+Lines With Coverage Data    -> 53% (8)
+Covered Instructions        -> 88% (42)
+Missed Instructions         -> 12% (6)
+`, buf.String())
+
+		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+			"body": `*Modules: category-search*
+
+Code Coverage Summary:
+
+Lines With Coverage Data    -> 53% (8)
+Covered Instructions        -> **88%** (42)
+`,
+		})
+
+		propGetter.AssertExpectations(t)
+	})
+}
+
 func TestDefaultRunner_Run_NoChanges(t *testing.T) {
 
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
@@ -301,6 +423,55 @@ Missed Instructions         -> 0% (0)
 	})
 }
 
+func TestDefaultRunner_Run_NoChanges_Vela(t *testing.T) {
+
+	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
+
+		propGetter := mocks.NewMockPropertyGetter()
+
+		propGetter.On("GetProperty", "PLUGIN_DEBUG").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
+		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+
+		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReportEmpty.xml", true)
+		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
+		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
+		propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("src/main/java", true)
+		propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("SOME_API_KEY", true)
+		propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return(mockServerURL, true)
+
+		propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
+		propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("123", true)
+		propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
+		propGetter.On("GetProperty", "REPOSITORY_ORG").Return("some_org", true)
+		propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
+		propGetter.On("GetProperty", "REPOSITORY_NAME").Return("some_repo", true)
+
+		var buf bytes.Buffer
+
+		err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified.diff"), &buf)
+		assert.NoError(t, err)
+
+		assert.Equal(t, `Missed Instructions:
+
+Code Coverage Summary:
+Lines Without Coverage Data -> 100% (9)
+Lines With Coverage Data    -> 0% (0)
+Covered Instructions        -> 100% (0)
+Missed Instructions         -> 0% (0)
+`, buf.String())
+
+		requestAsserter.AssertNoRequestsWereMade(t)
+
+		propGetter.AssertExpectations(t)
+	})
+}
+
 func TestDefaultRunner_RunNoCoverageData(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
 
@@ -310,10 +481,15 @@ func TestDefaultRunner_RunNoCoverageData(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("jacoco", true)
 	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
 
 	var buf bytes.Buffer
 
@@ -351,10 +527,14 @@ func TestDefaultRunner_RunErrOpeningCoverFile(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("anything", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
-
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
 	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified.diff"), os.Stdout)
 	assert.EqualError(t, err, "Failed loading coverage report: Could not open xml file ../test/blahblah.xml: open ../test/blahblah.xml: no such file or directory")
 
@@ -370,10 +550,14 @@ func TestDefaultRunner_RunBadUnified_UnfinishedBlock(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
-
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
 	var buf bytes.Buffer
 
 	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/unfinished_block_sample_unified.diff"), &buf)
@@ -391,10 +575,14 @@ func TestDefaultRunner_RunBadUnified_UnfinishedBlock2(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
-
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
 	var buf bytes.Buffer
 
 	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/unfinished_block_2_sample_unified.diff"), &buf)
@@ -412,10 +600,14 @@ func TestDefaultRunner_RunBadUnified_BadFilename(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
-
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
 	var buf bytes.Buffer
 
 	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/badfilename_sample_unified.diff"), &buf)
@@ -433,10 +625,14 @@ func TestDefaultRunner_RunBadUnified_ExtraLinesBlock(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
-
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
 	var buf bytes.Buffer
 
 	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/extralines_block_sample_unified.diff"), &buf)
@@ -454,9 +650,14 @@ func TestDefaultRunner_RunBadUnified_AlphaInAtBlock(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
 
 	var buf bytes.Buffer
 
@@ -475,9 +676,14 @@ func TestDefaultRunner_RunBadUnified_AlphaInAtBlock2(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
 
 	var buf bytes.Buffer
 
@@ -496,9 +702,14 @@ func TestDefaultRunner_RunCoverageNotXml(t *testing.T) {
 	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("src/main/java", true)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
 	propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
 	propGetter.On("GetProperty", "DRONE_PULL_REQUEST").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_OWNER").Return("", false)
 	propGetter.On("GetProperty", "DRONE_REPO_NAME").Return("", false)
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
 
 	var buf bytes.Buffer
 
