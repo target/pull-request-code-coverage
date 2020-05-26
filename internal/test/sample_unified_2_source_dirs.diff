@@ -45,7 +45,7 @@ index bf7d601..a3827e9 100755
 @@ -49,0 +50,3 @@ public class CategorySearchApplication extends SpringBootServletInitializer {
 +    counter++
 +
-+    System.out.print("Soemthing");
++    System.out.print("Something");
 @@ -70 +71,0 @@ public class CategorySearchApplication extends SpringBootServletInitializer {
 -
 diff --git a/category-search/src/main/java/com/tgt/SomethingElse.java b/category-search/src/main/java/com/tgt/SomethingElse.java
@@ -53,7 +53,7 @@ index bf7d601..a3827e9 100755
 --- a/category-search/src/main/java/com/tgt/SomethingElse.java
 +++ b/category-search/src/main/java/com/tgt/SomethingElse.java
 @@ -49,0 +50 @@
-+    System.out.print("Soemthing 2");
++    System.out.print("Something 2");
 @@ -70 +71,0 @@
 -
 diff --git a/category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt b/category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt
@@ -63,8 +63,8 @@ index bf7d601..a3827e9 100755
 @@ -3,0 +4,3 @@
 +    counter++
 +    doingSomething();
-+    System.out.print("Soemthing");
++    System.out.print("Something");
 @@ -9,0 +10,3 @@
 +    counter2++
 +    doingSomething2();
-+    System.out.print("Soemthing2");
++    System.out.print("Something2");

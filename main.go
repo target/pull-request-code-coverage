@@ -1,9 +1,10 @@
 package main
 
 import (
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin"
-	log "github.com/sirupsen/logrus"
 	"os"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {

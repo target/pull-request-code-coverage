@@ -2,12 +2,14 @@ package unifieddiff
 
 import (
 	"bufio"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
-	"github.com/pkg/errors"
 	"io"
 	"regexp"
+
 	"strconv"
 	"strings"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
+	"github.com/pkg/errors"
 )
 
 type Loader struct {
@@ -15,10 +17,10 @@ type Loader struct {
 	SourceDirs []string
 }
 
-func NewChangedSourceLinesLoader(Module string, SourceDirs []string) *Loader {
+func NewChangedSourceLinesLoader(module string, sourceDirs []string) *Loader {
 	return &Loader{
-		Module:     Module,
-		SourceDirs: SourceDirs,
+		Module:     module,
+		SourceDirs: sourceDirs,
 	}
 }
 

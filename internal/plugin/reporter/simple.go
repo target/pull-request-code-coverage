@@ -2,10 +2,11 @@ package reporter
 
 import (
 	"fmt"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
 	"io"
 	"log"
 	"strings"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
 )
 
 type Simple struct {
@@ -52,6 +53,10 @@ func (s *Simple) Write(changedLinesWithCoverage domain.SourceLineCoverageReport)
 	}
 
 	return nil
+}
+
+func (s *Simple) GetName() string {
+	return "simple stdout reporter"
 }
 
 func generateSummaryLines(changedLinesWithCoverage domain.SourceLineCoverageReport, formatter func(linesWithDataCount int, linesWithoutDataCount int, covered int, missed int) []string) []string {

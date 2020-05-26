@@ -1,0 +1,39 @@
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - errcheck
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - golint
+    - goprintffuncname
+    - gosec
+    - govet
+    - ineffassign
+    - interfacer
+    - maligned
+    - misspell
+    - nakedret
+    - rowserrcheck
+    - scopelint
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - scopelint
+        - funlen

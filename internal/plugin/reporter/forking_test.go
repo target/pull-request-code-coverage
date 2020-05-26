@@ -1,11 +1,12 @@
 package reporter
 
 import (
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
+	"testing"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 func TestForking_Write(t *testing.T) {

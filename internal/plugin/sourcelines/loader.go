@@ -1,8 +1,9 @@
 package sourcelines
 
 import (
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
 	"os"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
 )
 
 type Loader interface {

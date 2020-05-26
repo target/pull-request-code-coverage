@@ -1,7 +1,7 @@
 package reporter
 
 import (
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -13,4 +13,10 @@ func (m *MockReporter) Write(d domain.SourceLineCoverageReport) error {
 	args := m.Called(d)
 
 	return args.Error(0)
+}
+
+func (m *MockReporter) GetName() string {
+	args := m.Called()
+	return args.String(0)
+
 }

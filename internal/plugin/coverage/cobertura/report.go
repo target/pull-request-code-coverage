@@ -2,15 +2,17 @@ package cobertura
 
 import (
 	"encoding/xml"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
+
 	"log"
 	"os"
 	"strings"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type DefaultLoader struct {

@@ -2,11 +2,13 @@ package plugin
 
 import (
 	"bytes"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/test/mocks"
-	"github.com/stretchr/testify/assert"
+
 	"os"
 	"strconv"
 	"testing"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/test/mocks"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDefaultRunner_RunNotFoundProps(t *testing.T) {
@@ -76,7 +78,7 @@ func TestDefaultRunner_Run_GoExample_WithSourceDir(t *testing.T) {
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/example_go_coverage_with_source_dir.xml", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("cobertura", true)
 		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("", false)
-		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("/go/git.target.com/search-product-team/pull-request-code-coverage", true)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("/go/git.target.com/searchoss/pull-request-code-coverage", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
@@ -129,7 +131,7 @@ func TestDefaultRunner_Run_GoExample(t *testing.T) {
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/example_go_coverage.xml", true)
 		propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("cobertura", true)
 		propGetter.On("GetProperty", "PLUGIN_MODULE").Return("", false)
-		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("/go/git.target.com/search-product-team/pull-request-code-coverage", true)
+		propGetter.On("GetProperty", "PLUGIN_SOURCE_DIRS").Return("/go/git.target.com/searchoss/pull-request-code-coverage", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("SOME_API_KEY", true)
 		propGetter.On("GetProperty", "PLUGIN_GH_API_BASE_URL").Return(mockServerURL, true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
@@ -196,7 +198,7 @@ func TestDefaultRunner_Run(t *testing.T) {
 
 		assert.Equal(t, `Missed Instructions:
 --- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
-    System.out.print("Soemthing");
+    System.out.print("Something");
 
 Code Coverage Summary:
 Lines Without Coverage Data -> 78% (7)
@@ -253,7 +255,7 @@ func TestDefaultRunner_Run_Vela(t *testing.T) {
 
 		assert.Equal(t, `Missed Instructions:
 --- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
-    System.out.print("Soemthing");
+    System.out.print("Something");
 
 Code Coverage Summary:
 Lines Without Coverage Data -> 78% (7)
@@ -300,9 +302,9 @@ func TestDefaultRunner_Run_2_Source_Dirs(t *testing.T) {
 
 		assert.Equal(t, `Missed Instructions:
 --- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
-    System.out.print("Soemthing");
+    System.out.print("Something");
 --- category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12
-    System.out.print("Soemthing2");
+    System.out.print("Something2");
 
 Code Coverage Summary:
 Lines Without Coverage Data -> 47% (7)
@@ -361,9 +363,9 @@ func TestDefaultRunner_Run_2_Source_Dirs_Vela(t *testing.T) {
 
 		assert.Equal(t, `Missed Instructions:
 --- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
-    System.out.print("Soemthing");
+    System.out.print("Something");
 --- category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12
-    System.out.print("Soemthing2");
+    System.out.print("Something2");
 
 Code Coverage Summary:
 Lines Without Coverage Data -> 47% (7)

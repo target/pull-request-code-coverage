@@ -3,13 +3,16 @@ package mocks
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
+
+const HTTPResponseCreated = 201
 
 type CapturedRequest struct {
 	req  *http.Request
@@ -26,7 +29,7 @@ func WithMockGithubAPI(doer func(mockServerURL string, requestAsserter GithubAPI
 				body: mustReadAll(r.Body),
 			})
 
-			w.WriteHeader(201)
+			w.WriteHeader(HTTPResponseCreated)
 		}),
 	)
 	defer ts.Close()

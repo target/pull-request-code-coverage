@@ -2,19 +2,20 @@ package plugin
 
 import (
 	"fmt"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/calculator"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/cobertura"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/coverage/jacoco"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/pluginhttp"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/pluginjson"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/reporter"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"io"
 	"strconv"
 	"strings"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/calculator"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/cobertura"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/jacoco"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/pluginhttp"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/pluginjson"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/reporter"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type DefaultRunner struct{}
@@ -111,6 +112,11 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 	if ghAPIKeyFound && ghAPIBaseURLFound && repoPRFound && repoOwnerFound && repoNameFound {
 		reporters = append(reporters, reporter.NewGithubPullRequest(ghAPIKey, ghAPIBaseURL, repoPR, repoOwner, repoName, &pluginhttp.DefaultClient{}, &pluginjson.DefaultClient{}))
 	}
+	logrus.Info("enabled reporters are ")
+	for _, eachOne := range reporters {
+		logrus.Info(eachOne.GetName())
+	}
+
 	return reporter.NewForking(reporters).Write(changedLinesWithCoverage)
 }
 

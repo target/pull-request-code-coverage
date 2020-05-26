@@ -1,10 +1,12 @@
 package reporter
 
 import (
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
+
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+
 	"testing"
 )
 

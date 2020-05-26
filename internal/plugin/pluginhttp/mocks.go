@@ -1,9 +1,10 @@
 package pluginhttp
 
 import (
-	"github.com/stretchr/testify/mock"
 	"io"
 	"net/http"
+
+	"github.com/stretchr/testify/mock"
 )
 
 type MockClient struct {

@@ -1,15 +1,16 @@
 package reporter
 
 import (
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/pluginhttp"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/pluginjson"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/pluginhttp"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/pluginjson"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestGithubPullRequest_Write_FailedNewRequest(t *testing.T) {

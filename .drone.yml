@@ -1,20 +1,27 @@
+lint: &lint
+  image: golangci/golangci-lint
+  pull: true
+  commands:
+    - golangci-lint run
+
+format: &format
+  image: golang:1.13
+  commands:
+    - make format
+
 build: &build
-  image: golang:1.11.2
+  image: golang:1.13
   environment:
   - CGO_ENABLED=0
   - GOOS=linux
+  - GO111MODULE=on
   commands:
-  - go get -u github.com/golang/dep/cmd/dep
-  - go get -u github.com/alecthomas/gometalinter
   - go get github.com/axw/gocov/gocov
   - go get github.com/AlekSi/gocov-xml
-  - gometalinter --install
-  - dep ensure
   - go test -v -coverpkg=./... -coverprofile=coverage.txt ./...
   - go tool cover -func=coverage.txt
   - gocov convert coverage.txt | gocov-xml > ./coverage.xml
   - cat ./coverage.xml
-  - ./bin/lint.sh
   - go build -a -installsuffix cgo -o plugin .
 
 check-pr-code-coverage: &check-pr-code-coverage
@@ -22,10 +29,9 @@ check-pr-code-coverage: &check-pr-code-coverage
   environment:
   - PLUGIN_COVERAGE_FILE=./coverage.xml
   - PLUGIN_COVERAGE_TYPE=cobertura
-  - PLUGIN_SOURCE_DIRS=/go/src/git.target.com/search-product-team/pull-request-code-coverage
+  - PLUGIN_SOURCE_DIRS=/go/src/git.target.com/searchoss/pull-request-code-coverage
   - PLUGIN_RUN_DIR=.
   - PLUGIN_GH_API_BASE_URL=https://git.target.com
-  - PLUGIN_DEBUG=true
   secrets:
   - source: pull_request_api_key
     target: plugin_gh_api_key
@@ -35,15 +41,24 @@ check-pr-code-coverage: &check-pr-code-coverage
 
 workspace:
   base: /go
-  path: src/git.target.com/search-product-team/pull-request-code-coverage
+  path: src/git.target.com/searchoss/pull-request-code-coverage
 
 pipeline:
-
   build-push:
     when:
       event: [push]
       branch: [master]
     <<: *build
+
+  check-format-on-pr:
+    when:
+      event: [pull_request]
+    <<: *format
+
+  check-lint-on-pr:
+    when:
+      event: [pull_request]
+    <<: *lint
 
   build-on-pr:
     when:

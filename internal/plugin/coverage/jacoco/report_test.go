@@ -2,9 +2,11 @@ package jacoco
 
 import (
 	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
+
 	"io"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_silentlyCall(t *testing.T) {

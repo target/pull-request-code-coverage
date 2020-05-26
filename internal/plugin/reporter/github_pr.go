@@ -3,12 +3,13 @@ package reporter
 import (
 	"bytes"
 	"fmt"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/domain"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/pluginhttp"
-	"git.target.com/search-product-team/pull-request-code-coverage/internal/plugin/pluginjson"
-	"github.com/pkg/errors"
 	"io"
 	"strings"
+
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/pluginhttp"
+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/pluginjson"
+	"github.com/pkg/errors"
 )
 
 type GithubPullRequest struct {
@@ -20,6 +21,10 @@ type GithubPullRequest struct {
 	httpClient pluginhttp.Client
 	jsonClient pluginjson.Client
 }
+
+const (
+	HTTPResponseCreated = 201
+)
 
 func NewGithubPullRequest(apiKey string, apiBaseURL string, pr string, owner string, repo string, httpClient pluginhttp.Client, jsonClient pluginjson.Client) *GithubPullRequest {
 	return &GithubPullRequest{
@@ -65,11 +70,15 @@ func (s *GithubPullRequest) Write(changedLinesWithCoverage domain.SourceLineCove
 		return errors.Wrap(doErr, "Failed calling github")
 	}
 
-	if resp.StatusCode != 201 {
+	if resp.StatusCode != HTTPResponseCreated {
 		return errors.Errorf("Failed calling github: bad status code: %v", resp.StatusCode)
 	}
 
 	return nil
+}
+
+func (s *GithubPullRequest) GetName() string {
+	return "github pull request  reporter"
 }
 
 func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.SourceLineCoverageReport) (io.Reader, error) {
@@ -88,7 +97,7 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 
 		result := make([]string, 3)
 
-		result[0] = fmt.Sprintf("Code Coverage Summary:\n\n")
+		result[0] = fmt.Sprint("Code Coverage Summary:\n\n")
 		result[1] = fmt.Sprintf("Lines With Coverage Data    -> %.f%% (%d)\n", toPercent(safeDiv(float32(linesWithDataCount), float32(totalLines), 1)), linesWithDataCount)
 		result[2] = fmt.Sprintf("Covered Instructions        -> **%.f%%** (%d)\n", toPercent(safeDiv(float32(covered), float32(totalInstructions), 1)), covered)
 
