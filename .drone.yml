@@ -22,7 +22,7 @@ build: &build
   - go tool cover -func=coverage.txt
   - gocov convert coverage.txt | gocov-xml > ./coverage.xml
   - cat ./coverage.xml
-  - go build -a -installsuffix cgo -o plugin .
+  - go build -a -installsuffix cgo -o bin/plugin
 
 check-pr-code-coverage: &check-pr-code-coverage
   image: alpine:latest
@@ -81,7 +81,7 @@ pipeline:
     - source: docker_password
       target: plugin_password
     registry: docker.target.com
-    repo: docker.target.com/search/pull-request-code-coverage
+    repo: docker.target.com/app/pull-request-code-coverage
     dockerfile: Dockerfile
     tags:
     - latest
@@ -91,6 +91,6 @@ secrets:
   pull_request_api_key:
     path: /secret/org/searchoss/pull_request_api_key
   docker_username:
-    path: /secret/org/searchoss/docker_username
+    path: secret/org/TargetOSS/ARTIFACTORY_USERNAME
   docker_password:
-    path: /secret/org/searchoss/docker_password
+    path: secret/org/TargetOSS/ARTIFACTORY_PASSWORD
