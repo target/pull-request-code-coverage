@@ -1,0 +1,122 @@
+version: "1"
+
+build: &build
+  image: golang:1.13
+  environment:
+    - CGO_ENABLED=0
+    - GOOS=linux
+    - GO111MODULE=on
+  commands:
+    - go get github.com/axw/gocov/gocov
+    - go get github.com/AlekSi/gocov-xml
+    - go test -v -coverpkg=./... -coverprofile=coverage.txt ./...
+    - go tool cover -func=coverage.txt
+    - gocov convert coverage.txt | gocov-xml > ./coverage.xml
+    - cat ./coverage.xml
+    - go build -a -installsuffix cgo -o bin/plugin
+
+check-pr-code-coverage: &check-pr-code-coverage
+  image: alpine:latest
+  environment:
+    - PLUGIN_COVERAGE_FILE=./coverage.xml
+    - PLUGIN_COVERAGE_TYPE=cobertura
+    - PLUGIN_SOURCE_DIRS=git.target.com/searchoss/pull-request-code-coverage
+    - PLUGIN_RUN_DIR=bin
+    - PLUGIN_GH_API_BASE_URL=https://git.target.com
+  secrets:
+    - source: pull_request_api_key
+      target: plugin_gh_api_key
+  commands:
+    - apk --no-cache add ca-certificates git bash openssh-client
+    - ./scripts/start.sh
+steps:
+  - name: build-push
+    image: golang:1.13
+    <<: *build
+    ruleset:
+      branch:
+        - master
+      event:
+        - push
+
+  - name : check-format-on-pr
+    image: golang:1.13
+    commands:
+      - make format
+    ruleset:
+      branch:
+        - master
+      event:
+        - pull_request
+
+  - name : check-lint-on-pr
+    image: golangci/golangci-lint
+    pull: true
+    commands:
+      - golangci-lint run
+    ruleset:
+      branch:
+        - master
+      event:
+        - pull_request
+
+  - name : build-on-pr
+    <<: *build
+    ruleset:
+      branch:
+        - master
+      event:
+        - pull_request
+
+  - name: check-pr-code-coverage
+    <<: *check-pr-code-coverage
+    ruleset:
+      branch:
+        - master
+      event:
+        - pull_request
+    when:
+      event: [pull_request]
+
+  - name: docker-pull-request
+    image: docker.target.com/vela-plugins/docker:v0.2.3-1
+    ruleset:
+      branch:
+        - master
+      event:
+        - pull_request
+    secrets: [ docker_password ]
+    parameters:
+      dry_run: true
+      registry: docker.target.com
+      repo: docker.target.com/app/pull-request-code-coverage
+      tags:
+        - latest
+        - 1-${BUILD_COMMIT:0:7}
+      dockerfile: Dockerfile
+      username: svcpejkn001
+
+
+  - name: docker-push
+    image: docker.target.com/vela-plugins/docker:v0.2.3-1
+    ruleset:
+      branch:
+        - master
+      event:
+        - push
+    secrets: [ docker_password ]
+    parameters:
+      registry: docker.target.com
+      repo: docker.target.com/app/pull-request-code-coverage
+      tags:
+        - latest
+        - 1-${BUILD_COMMIT:0:7}
+      dockerfile: Dockerfile
+      username: svcpejkn001
+
+secrets:
+  - name: docker_password
+    key: tap/vela-secrets/ARTIFACTORY_SVCPEJKN001_BINREPO
+    engine: native
+    type: shared
+

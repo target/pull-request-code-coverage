@@ -1,4 +1,7 @@
+
 # pull-request-code-coverage
+
+[![Build Status](https://vela-server.prod.target.com/badge/TargetOSS/pull-request-code-coverage/status.svg)](https://vela.prod.target.com/TargetOSS/pull-request-code-coverage)
 
 Drone plugin to allow detecting code coverage for only the lines changed in a PR.
 

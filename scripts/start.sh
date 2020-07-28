@@ -38,5 +38,5 @@ git config --global user.name "drone"
 git config --global user.email "drone@drone.shipt.com"
 
 
-git fetch --no-tags origin  $branch
-git --no-pager diff --unified=0 origin/$branch $PLUGIN_MODULE | $PLUGIN_RUN_DIR/plugin
+git fetch --no-tags origin  "$branch"
+git --no-pager diff --unified=0 origin/"$branch" $PLUGIN_MODULE | $PLUGIN_RUN_DIR/plugin

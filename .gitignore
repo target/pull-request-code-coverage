@@ -4,3 +4,4 @@ coverage.txt
 coverage.xml
 vendor/
 /plugin
+pull-request-code-coverage
