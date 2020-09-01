@@ -113,8 +113,10 @@ Missed Instructions         -> 3% (5)
 		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
 			"body": `Code Coverage Summary:
 
+Lines Without Coverage Data -> 92% (2216)
 Lines With Coverage Data    -> 8% (182)
 Covered Instructions        -> **97%** (177)
+Missed Instructions         -> 3% (5)
 `,
 		})
 
@@ -166,8 +168,10 @@ Missed Instructions         -> 3% (5)
 		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
 			"body": `Code Coverage Summary:
 
+Lines Without Coverage Data -> 92% (2216)
 Lines With Coverage Data    -> 8% (182)
 Covered Instructions        -> **97%** (177)
+Missed Instructions         -> 3% (5)
 `,
 		})
 
@@ -212,8 +216,10 @@ Missed Instructions         -> 27% (3)
 
 Code Coverage Summary:
 
+Lines Without Coverage Data -> 78% (7)
 Lines With Coverage Data    -> 22% (2)
 Covered Instructions        -> **73%** (8)
+Missed Instructions         -> 27% (3)
 `,
 		})
 
@@ -269,8 +275,10 @@ Missed Instructions         -> 27% (3)
 
 Code Coverage Summary:
 
+Lines Without Coverage Data -> 78% (7)
 Lines With Coverage Data    -> 22% (2)
 Covered Instructions        -> **73%** (8)
+Missed Instructions         -> 27% (3)
 `,
 		})
 
@@ -318,8 +326,10 @@ Missed Instructions         -> 12% (6)
 
 Code Coverage Summary:
 
+Lines Without Coverage Data -> 47% (7)
 Lines With Coverage Data    -> 53% (8)
 Covered Instructions        -> **88%** (42)
+Missed Instructions         -> 12% (6)
 `,
 		})
 
@@ -379,8 +389,10 @@ Missed Instructions         -> 12% (6)
 
 Code Coverage Summary:
 
+Lines Without Coverage Data -> 47% (7)
 Lines With Coverage Data    -> 53% (8)
 Covered Instructions        -> **88%** (42)
+Missed Instructions         -> 12% (6)
 `,
 		})
 

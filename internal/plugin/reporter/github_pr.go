@@ -95,11 +95,13 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 		totalLines := linesWithDataCount + linesWithoutDataCount
 		totalInstructions := covered + missed
 
-		result := make([]string, 3)
+		result := make([]string, 5)
 
-		result[0] = fmt.Sprint("Code Coverage Summary:\n\n")
-		result[1] = fmt.Sprintf("Lines With Coverage Data    -> %.f%% (%d)\n", toPercent(safeDiv(float32(linesWithDataCount), float32(totalLines), 1)), linesWithDataCount)
-		result[2] = fmt.Sprintf("Covered Instructions        -> **%.f%%** (%d)\n", toPercent(safeDiv(float32(covered), float32(totalInstructions), 1)), covered)
+		result[0] = fmt.Sprintf("Code Coverage Summary:\n\n")
+		result[1] = fmt.Sprintf("Lines Without Coverage Data -> %.f%% (%d)\n", toPercent(safeDiv(float32(linesWithoutDataCount), float32(totalLines), 0)), linesWithoutDataCount)
+		result[2] = fmt.Sprintf("Lines With Coverage Data    -> %.f%% (%d)\n", toPercent(safeDiv(float32(linesWithDataCount), float32(totalLines), 1)), linesWithDataCount)
+		result[3] = fmt.Sprintf("Covered Instructions        -> **%.f%%** (%d)\n", toPercent(safeDiv(float32(covered), float32(totalInstructions), 1)), covered)
+		result[4] = fmt.Sprintf("Missed Instructions         -> %.f%% (%d)\n", toPercent(safeDiv(float32(missed), float32(totalInstructions), 0)), missed)
 
 		return result
 	})...)
