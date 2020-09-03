@@ -18,13 +18,13 @@ build: &build
 check-pr-code-coverage: &check-pr-code-coverage
   image: alpine:latest
   environment:
-    - PLUGIN_COVERAGE_FILE=./coverage.xml
-    - PLUGIN_COVERAGE_TYPE=cobertura
-    - PLUGIN_SOURCE_DIRS=git.target.com/searchoss/pull-request-code-coverage
+    - PARAMETER_COVERAGE_FILE=./coverage.xml
+    - PARAMETER_COVERAGE_TYPE=cobertura
+    - PARAMETER_SOURCE_DIRS=/vela/src/git.target.com/TargetOSS/pull-request-code-coverage
     - PLUGIN_RUN_DIR=bin
-    - PLUGIN_GH_API_BASE_URL=https://git.target.com
+    - PARAMETER_GH_API_BASE_URL=https://git.target.com
   secrets:
-    - source: pull_request_api_key
+    - source: github_pr_token
       target: plugin_gh_api_key
   commands:
     - apk --no-cache add ca-certificates git bash openssh-client
@@ -75,8 +75,6 @@ steps:
         - master
       event:
         - pull_request
-    when:
-      event: [pull_request]
 
   - name: docker-pull-request
     image: docker.target.com/vela-plugins/docker:v0.2.3-1
@@ -119,4 +117,7 @@ secrets:
     key: tap/vela-secrets/ARTIFACTORY_SVCPEJKN001_BINREPO
     engine: native
     type: shared
+  - name: github_pr_token
+    engine: native
+    type: repo
 

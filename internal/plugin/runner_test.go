@@ -117,7 +117,22 @@ Lines Without Coverage Data -> 92% (2216)
 Lines With Coverage Data    -> 8% (182)
 Covered Instructions        -> **97%** (177)
 Missed Instructions         -> 3% (5)
-`,
+
+<details><summary>Missed Instructions summary</summary>
+
+` + "```" + `
+--- internal/plugin/runner.go:72
+func GetCoverageReportLoader(coverageType string, sourceDir string) coverage.Loader {
+--- main.go:10
+	err := plugin.NewRunner().Run(os.LookupEnv, os.Stdin, os.Stdout)
+--- main.go:12
+	if err != nil {
+--- main.go:13
+		log.WithFields(log.Fields{
+--- main.go:17
+		os.Exit(1)
+` +
+				"```\n</details>",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -172,7 +187,22 @@ Lines Without Coverage Data -> 92% (2216)
 Lines With Coverage Data    -> 8% (182)
 Covered Instructions        -> **97%** (177)
 Missed Instructions         -> 3% (5)
-`,
+
+<details><summary>Missed Instructions summary</summary>
+
+` + "```" + `
+--- internal/plugin/runner.go:72
+func GetCoverageReportLoader(coverageType string, sourceDir string) coverage.Loader {
+--- main.go:10
+	err := plugin.NewRunner().Run(os.LookupEnv, os.Stdin, os.Stdout)
+--- main.go:12
+	if err != nil {
+--- main.go:13
+		log.WithFields(log.Fields{
+--- main.go:17
+		os.Exit(1)
+` +
+				"```\n</details>",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -220,7 +250,14 @@ Lines Without Coverage Data -> 78% (7)
 Lines With Coverage Data    -> 22% (2)
 Covered Instructions        -> **73%** (8)
 Missed Instructions         -> 27% (3)
-`,
+
+<details><summary>Missed Instructions summary</summary>
+
+` + "```" + `
+--- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
+    System.out.print("Something");
+` +
+				"```\n</details>",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -279,7 +316,14 @@ Lines Without Coverage Data -> 78% (7)
 Lines With Coverage Data    -> 22% (2)
 Covered Instructions        -> **73%** (8)
 Missed Instructions         -> 27% (3)
-`,
+
+<details><summary>Missed Instructions summary</summary>
+
+` + "```" + `
+--- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
+    System.out.print("Something");
+` +
+				"```\n</details>",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -330,7 +374,15 @@ Lines Without Coverage Data -> 47% (7)
 Lines With Coverage Data    -> 53% (8)
 Covered Instructions        -> **88%** (42)
 Missed Instructions         -> 12% (6)
-`,
+
+<details><summary>Missed Instructions summary</summary>
+
+` + "```" + `
+--- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
+    System.out.print("Something");
+--- category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12
+    System.out.print("Something2");
+` + "```\n</details>",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -393,7 +445,16 @@ Lines Without Coverage Data -> 47% (7)
 Lines With Coverage Data    -> 53% (8)
 Covered Instructions        -> **88%** (42)
 Missed Instructions         -> 12% (6)
-`,
+
+<details><summary>Missed Instructions summary</summary>
+
+` + "```" + `
+--- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
+    System.out.print("Something");
+--- category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12
+    System.out.print("Something2");
+` +
+				"```\n</details>",
 		})
 
 		propGetter.AssertExpectations(t)

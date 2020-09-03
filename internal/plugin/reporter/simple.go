@@ -2,9 +2,9 @@ package reporter
 
 import (
 	"fmt"
+
 	"io"
 	"log"
-	"strings"
 
 	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
 )
@@ -27,7 +27,7 @@ func (s *Simple) Write(changedLinesWithCoverage domain.SourceLineCoverageReport)
 	s.printf("Missed Instructions:\n")
 	for _, r := range changedLinesWithCoverage {
 		if r.MissedInstructionCount > 0 {
-			s.printf("--- %v\n", s.lineDescription(r.SourceLine))
+			s.printf("--- %v\n", lineDescription(r.SourceLine))
 			s.printf("%v\n", r.LineValue)
 		}
 	}
@@ -91,19 +91,4 @@ func (s *Simple) print(str string) {
 	if _, err := s.WritingFunc(s.Out, str); err != nil {
 		log.Panic(err)
 	}
-}
-
-func (s *Simple) lineDescription(l domain.SourceLine) string {
-	rawFileNameParts := []string{
-		l.Module, l.SrcDir, l.Pkg, l.FileName,
-	}
-
-	fileNameParts := []string{}
-	for _, part := range rawFileNameParts {
-		if len(part) > 0 {
-			fileNameParts = append(fileNameParts, part)
-		}
-	}
-
-	return fmt.Sprintf("%v:%v", strings.Join(fileNameParts, "/"), l.LineNumber)
 }

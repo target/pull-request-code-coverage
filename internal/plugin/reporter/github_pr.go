@@ -90,6 +90,14 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 	if len(modules) > 0 {
 		summaryLines = append(summaryLines, fmt.Sprintf("*Modules: %v*\n\n", strings.Join(modules, ", ")))
 	}
+	var missedInstructions string
+
+	for _, r := range changedLinesWithCoverage {
+		if r.MissedInstructionCount > 0 {
+			missedInstructions += fmt.Sprintf("--- %v\n", lineDescription(r.SourceLine))
+			missedInstructions += fmt.Sprintf("%v\n", r.LineValue)
+		}
+	}
 
 	summaryLines = append(summaryLines, generateSummaryLines(changedLinesWithCoverage, func(linesWithDataCount int, linesWithoutDataCount int, covered int, missed int) []string {
 		totalLines := linesWithDataCount + linesWithoutDataCount
@@ -105,7 +113,16 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 
 		return result
 	})...)
-	summary := strings.Join(summaryLines, "")
+
+	var summary string
+	if missedInstructions == "" {
+		summary = strings.Join(summaryLines, "")
+	} else {
+
+		summaryWithoutInstructions := strings.Join(summaryLines, "")
+		summary = summaryWithoutInstructions + "\n<details><summary>Missed Instructions summary</summary>\n\n" + "```\n" + missedInstructions + "```" +
+			"\n</details>"
+	}
 
 	data := map[string]string{
 		"body": summary,
