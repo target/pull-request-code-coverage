@@ -18,7 +18,7 @@ PR with a summary of the coverage details.
 
 ```yaml
 - name: check-pr-code-coverage
-   image: docker.target.com/search/pull-request-code-coverage
+   image: docker.target.com/app/pull-request-code-coverage
    pull: true
    ruleset:
      event: [pull_request]
@@ -41,7 +41,7 @@ PR with a summary of the coverage details.
 check-pr-code-coverage:
   when:
     event: [pull_request]
-  image: docker.target.com/search/pull-request-code-coverage
+  image: docker.target.com/app/pull-request-code-coverage
   pull: true
   coverage_type: jacoco
   coverage_file: some-sub-module/build/reports/jacoco/test/jacocoTestReport.xml
