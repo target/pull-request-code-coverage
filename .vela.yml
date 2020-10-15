@@ -44,8 +44,6 @@ steps:
     commands:
       - make format
     ruleset:
-      branch:
-        - master
       event:
         - pull_request
 
@@ -55,32 +53,24 @@ steps:
     commands:
       - golangci-lint run
     ruleset:
-      branch:
-        - master
       event:
         - pull_request
 
   - name : build-on-pr
     <<: *build
     ruleset:
-      branch:
-        - master
       event:
         - pull_request
 
   - name: check-pr-code-coverage
     <<: *check-pr-code-coverage
     ruleset:
-      branch:
-        - master
       event:
         - pull_request
 
   - name: docker-pull-request
     image: docker.target.com/vela-plugins/docker:v0.2.3-1
     ruleset:
-      branch:
-        - master
       event:
         - pull_request
     secrets: [ docker_password ]

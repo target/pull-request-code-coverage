@@ -32,7 +32,7 @@ set -x
 
 PLUGIN_MODULE="${PLUGIN_MODULE:-}"
 PLUGIN_RUN_DIR="${PLUGIN_RUN_DIR:-}"
-branch="$(get_env_var "${DRONE_BRANCH:-}" "${REPOSITORY_BRANCH:-}")"
+branch="$(get_env_var "${DRONE_BRANCH:-}" "${VELA_PULL_REQUEST_TARGET:-}")"
 
 git config --global user.name "drone"
 git config --global user.email "drone@drone.shipt.com"

@@ -24,8 +24,8 @@ func NewRunner() *DefaultRunner {
 	return &DefaultRunner{}
 }
 
-//Run ...
-//nolint: gocyclo
+// Run ...
+// nolint: gocyclo
 func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSourceLinesSource io.Reader, reportDefaultOut io.Writer) error {
 
 	rawSourceDirs, found := getActiveEnvVariable(propertyGetter, "PLUGIN_SOURCE_DIRS", "PARAMETER_SOURCE_DIRS")
