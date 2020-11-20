@@ -30,7 +30,7 @@ fi
 
 set -x
 
-PLUGIN_MODULE="${PLUGIN_MODULE:-}"
+module="$(get_env_var "${PLUGIN_MODULE:-}" "${PARAMETER_MODULE:-}")"
 PLUGIN_RUN_DIR="${PLUGIN_RUN_DIR:-}"
 branch="$(get_env_var "${DRONE_BRANCH:-}" "${VELA_PULL_REQUEST_TARGET:-}")"
 
@@ -39,4 +39,4 @@ git config --global user.email "drone@drone.shipt.com"
 
 
 git fetch --no-tags origin  "$branch"
-git --no-pager diff --unified=0 origin/"$branch" $PLUGIN_MODULE | $PLUGIN_RUN_DIR/plugin
+git --no-pager diff --unified=0 origin/"$branch" $module | $PLUGIN_RUN_DIR/plugin
