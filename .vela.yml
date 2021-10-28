@@ -69,7 +69,7 @@ steps:
         - pull_request
 
   - name: docker-pull-request
-    image: docker.target.com/vela-plugins/docker:v0.2.3-1
+    image: docker.target.com/vela-plugins/kaniko:v0.5.0-1
     ruleset:
       event:
         - pull_request
@@ -86,7 +86,7 @@ steps:
 
 
   - name: docker-push
-    image: docker.target.com/vela-plugins/docker:v0.2.3-1
+    image: docker.target.com/vela-plugins/kaniko:v0.5.0-1
     ruleset:
       branch:
         - master

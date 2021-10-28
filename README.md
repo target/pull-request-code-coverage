@@ -3,7 +3,7 @@
 
 [![Build Status](https://vela-server.prod.target.com/badge/TargetOSS/pull-request-code-coverage/status.svg)](https://vela.prod.target.com/TargetOSS/pull-request-code-coverage)
 
-Drone plugin to allow detecting code coverage for only the lines changed in a PR.
+Vela plugin to allow detecting code coverage for only the lines changed in a PR.
 
 Sometimes when working to get a repo to an acceptable level of code coverage, it can be hard to tell if one change is
 covered enough.  This plugin will look at just the lines changed in the PR and report code coverage for only those
@@ -34,27 +34,6 @@ PR with a summary of the coverage details.
      - source: pull_request_api_key
        target: plugin_gh_api_key
 ```
-
-## DRONE Usage
-
-```yaml
-check-pr-code-coverage:
-  when:
-    event: [pull_request]
-  image: docker.target.com/app/pull-request-code-coverage
-  pull: true
-  coverage_type: jacoco
-  coverage_file: some-sub-module/build/reports/jacoco/test/jacocoTestReport.xml
-  source_dirs:
-    - src/main/java
-    - src/main/kotlin
-  gh_api_base_url: https://git.target.com
-  module: some-sub-module
-  secrets:
-  - source: pull_request_api_key
-    target: plugin_gh_api_key
-```
-
 
 
 #### Parameters
