@@ -1,7 +1,7 @@
 version: "1"
 
 build: &build
-  image: golang:1.17
+  image: hub.docker.target.com/golang:1.17
   environment:
     - CGO_ENABLED=0
     - GOOS=linux
@@ -16,7 +16,7 @@ build: &build
     - go build -a -installsuffix cgo -o bin/plugin
 
 check-pr-code-coverage: &check-pr-code-coverage
-  image: alpine:latest
+  image: hub.docker.target.com/alpine:latest
   environment:
     - PARAMETER_COVERAGE_FILE=./coverage.xml
     - PARAMETER_COVERAGE_TYPE=cobertura
@@ -32,7 +32,7 @@ check-pr-code-coverage: &check-pr-code-coverage
     - ./scripts/start.sh
 steps:
   - name: build-push
-    image: golang:1.17
+    image: hub.docker.target.com/golang:1.17
     <<: *build
     ruleset:
       branch:
@@ -41,7 +41,7 @@ steps:
         - push
 
   - name : check-format-on-pr
-    image: golang:1.17
+    image: hub.docker.target.com/golang:1.17
     commands:
       - make format
     ruleset:
