@@ -5,12 +5,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/target/pull-request-code-coverage/internal/plugin/domain"
+	"github.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
+	"github.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
 )
 
 func TestGithubPullRequest_Write_FailedNewRequest(t *testing.T) {

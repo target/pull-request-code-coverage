@@ -1,9 +1,9 @@
 package calculator
 
 import (
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 	"github.com/sirupsen/logrus"
+	"github.com/target/pull-request-code-coverage/internal/plugin/coverage"
+	"github.com/target/pull-request-code-coverage/internal/plugin/domain"
 )
 
 type Coverage interface {

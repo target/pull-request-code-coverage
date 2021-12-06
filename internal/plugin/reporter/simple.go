@@ -6,7 +6,7 @@ import (
 	"io"
 	"log"
 
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
+	"github.com/target/pull-request-code-coverage/internal/plugin/domain"
 )
 
 type Simple struct {

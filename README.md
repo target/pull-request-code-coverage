@@ -67,7 +67,7 @@ Once you have coverage.xml same can  be passed as an input to plugin shown below
      #coverage.xml generated in above step
      coverage_file: coverage.xml
      source_dirs:
-       - /vela/src/git.target.com/TargetOSS/pull-request-code-coverage
+       - /vela/src/github.com/targetOSS/pull-request-code-coverage
      gh_api_base_url: https://git.target.com
    secrets:
      - source: pull_request_api_key

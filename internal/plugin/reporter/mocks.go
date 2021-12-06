@@ -1,8 +1,8 @@
 package reporter
 
 import (
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 	"github.com/stretchr/testify/mock"
+	"github.com/target/pull-request-code-coverage/internal/plugin/domain"
 )
 
 type MockReporter struct {

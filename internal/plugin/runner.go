@@ -6,16 +6,16 @@ import (
 	"strconv"
 	"strings"
 
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/calculator"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/cobertura"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/reporter"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/target/pull-request-code-coverage/internal/plugin/calculator"
+	"github.com/target/pull-request-code-coverage/internal/plugin/coverage"
+	"github.com/target/pull-request-code-coverage/internal/plugin/coverage/cobertura"
+	"github.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco"
+	"github.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
+	"github.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
+	"github.com/target/pull-request-code-coverage/internal/plugin/reporter"
+	"github.com/target/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff"
 )
 
 type DefaultRunner struct{}

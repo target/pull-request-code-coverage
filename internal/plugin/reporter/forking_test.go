@@ -3,10 +3,10 @@ package reporter
 import (
 	"testing"
 
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/target/pull-request-code-coverage/internal/plugin/domain"
 )
 
 func TestForking_Write(t *testing.T) {

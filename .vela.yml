@@ -20,7 +20,7 @@ check-pr-code-coverage: &check-pr-code-coverage
   environment:
     - PARAMETER_COVERAGE_FILE=./coverage.xml
     - PARAMETER_COVERAGE_TYPE=cobertura
-    - PARAMETER_SOURCE_DIRS=/vela/src/git.target.com/TargetOSS/pull-request-code-coverage
+    - PARAMETER_SOURCE_DIRS=/vela/src/github.com/targetOSS/pull-request-code-coverage
     - PARAMETER_RUN_DIR=bin
     - PARAMETER_GH_API_BASE_URL=https://git.target.com
     - PARAMETER_DEBUG=true

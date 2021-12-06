@@ -9,10 +9,10 @@ import (
 	"os"
 	"strings"
 
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/target/pull-request-code-coverage/internal/plugin/coverage"
+	"github.com/target/pull-request-code-coverage/internal/plugin/domain"
 )
 
 type DefaultLoader struct {

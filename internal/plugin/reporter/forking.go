@@ -1,8 +1,8 @@
 package reporter
 
 import (
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 	"github.com/pkg/errors"
+	"github.com/target/pull-request-code-coverage/internal/plugin/domain"
 )
 
 type Forking struct {

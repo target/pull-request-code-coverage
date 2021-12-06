@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"git.target.com/target/pull-request-code-coverage/internal/plugin"
 	log "github.com/sirupsen/logrus"
+	"github.com/target/pull-request-code-coverage/internal/plugin"
 )
 
 func main() {

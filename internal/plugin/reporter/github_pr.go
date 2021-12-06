@@ -6,10 +6,10 @@ import (
 	"io"
 	"strings"
 
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
-	"git.target.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
 	"github.com/pkg/errors"
+	"github.com/target/pull-request-code-coverage/internal/plugin/domain"
+	"github.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
+	"github.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
 )
 
 type GithubPullRequest struct {

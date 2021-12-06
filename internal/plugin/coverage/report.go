@@ -1,6 +1,6 @@
 package coverage
 
-import "git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
+import "github.com/target/pull-request-code-coverage/internal/plugin/domain"
 
 type Loader interface {
 	Load(coverageFile string) (Report, error)

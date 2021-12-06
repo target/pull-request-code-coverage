@@ -2,10 +2,10 @@
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
 <coverage line-rate="0.9619565" branch-rate="0" lines-covered="177" lines-valid="184" branches-covered="0" branches-valid="0" complexity="0" version="" timestamp="1541793228625">
 	<sources>
-		<source>/go/git.target.com/target/pull-request-code-coverage</source>
+		<source>/go/github.com/target/pull-request-code-coverage</source>
 	</sources>
 	<packages>
-		<package name="git.target.com/target/pull-request-code-coverage" line-rate="0" branch-rate="0" complexity="0" line-count="4" line-hits="0">
+		<package name="github.com/target/pull-request-code-coverage" line-rate="0" branch-rate="0" complexity="0" line-count="4" line-hits="0">
 			<classes>
 				<class name="-" filename="main.go" line-rate="0" branch-rate="0" complexity="0" line-count="4" line-hits="0">
 					<methods>
@@ -27,7 +27,7 @@
 				</class>
 			</classes>
 		</package>
-		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin" line-rate="0.96428573" branch-rate="0" complexity="0" line-count="28" line-hits="27">
+		<package name="github.com/target/pull-request-code-coverage/internal/plugin" line-rate="0.96428573" branch-rate="0" complexity="0" line-count="28" line-hits="27">
 			<classes>
 				<class name="-" filename="internal/plugin/runner.go" line-rate="0.75" branch-rate="0" complexity="0" line-count="4" line-hits="3">
 					<methods>
@@ -111,7 +111,7 @@
 				</class>
 			</classes>
 		</package>
-		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/calculator" line-rate="1" branch-rate="0" complexity="0" line-count="10" line-hits="10">
+		<package name="github.com/target/pull-request-code-coverage/internal/plugin/calculator" line-rate="1" branch-rate="0" complexity="0" line-count="10" line-hits="10">
 			<classes>
 				<class name="-" filename="internal/plugin/calculator/calculator.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
 					<methods>
@@ -155,7 +155,7 @@
 				</class>
 			</classes>
 		</package>
-		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/golang" line-rate="0" branch-rate="0" complexity="0" line-count="2" line-hits="0">
+		<package name="github.com/target/pull-request-code-coverage/internal/plugin/coverage/golang" line-rate="0" branch-rate="0" complexity="0" line-count="2" line-hits="0">
 			<classes>
 				<class name="-" filename="internal/plugin/coverage/golang/report.go" line-rate="0" branch-rate="0" complexity="0" line-count="1" line-hits="0">
 					<methods>
@@ -183,7 +183,7 @@
 				</class>
 			</classes>
 		</package>
-		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco" line-rate="1" branch-rate="0" complexity="0" line-count="29" line-hits="29">
+		<package name="github.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco" line-rate="1" branch-rate="0" complexity="0" line-count="29" line-hits="29">
 			<classes>
 				<class name="DefaultLoader" filename="internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="11" line-hits="11">
 					<methods>
@@ -313,7 +313,7 @@
 				</class>
 			</classes>
 		</package>
-		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/domain" line-rate="1" branch-rate="0" complexity="0" line-count="19" line-hits="19">
+		<package name="github.com/target/pull-request-code-coverage/internal/plugin/domain" line-rate="1" branch-rate="0" complexity="0" line-count="19" line-hits="19">
 			<classes>
 				<class name="SourceLineCoverageReport" filename="internal/plugin/domain/domain.go" line-rate="1" branch-rate="0" complexity="0" line-count="18" line-hits="18">
 					<methods>
@@ -387,7 +387,7 @@
 				</class>
 			</classes>
 		</package>
-		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/reporter" line-rate="1" branch-rate="0" complexity="0" line-count="25" line-hits="25">
+		<package name="github.com/target/pull-request-code-coverage/internal/plugin/reporter" line-rate="1" branch-rate="0" complexity="0" line-count="25" line-hits="25">
 			<classes>
 				<class name="-" filename="internal/plugin/reporter/reporter.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
 					<methods>
@@ -477,7 +477,7 @@
 				</class>
 			</classes>
 		</package>
-		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff" line-rate="1" branch-rate="0" complexity="0" line-count="64" line-hits="64">
+		<package name="github.com/target/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff" line-rate="1" branch-rate="0" complexity="0" line-count="64" line-hits="64">
 			<classes>
 				<class name="-" filename="internal/plugin/sourcelines/unifieddiff/changed_source_loader.go" line-rate="1" branch-rate="0" complexity="0" line-count="59" line-hits="59">
 					<methods>
@@ -633,7 +633,7 @@
 				</class>
 			</classes>
 		</package>
-		<package name="git.target.com/target/pull-request-code-coverage/internal/test/mocks" line-rate="1" branch-rate="0" complexity="0" line-count="3" line-hits="3">
+		<package name="github.com/target/pull-request-code-coverage/internal/test/mocks" line-rate="1" branch-rate="0" complexity="0" line-count="3" line-hits="3">
 			<classes>
 				<class name="-" filename="internal/test/mocks/property_getter.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
 					<methods>
