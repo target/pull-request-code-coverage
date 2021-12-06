@@ -3,7 +3,7 @@
 
 [![Build Status](https://vela-server.prod.target.com/badge/TargetOSS/pull-request-code-coverage/status.svg)](https://vela.prod.target.com/TargetOSS/pull-request-code-coverage)
 
-Vela plugin to allow detecting code coverage for only the lines changed in a PR.
+[Vela](https://go-vela.github.io/docs/) plugin to allow detecting code coverage for only the lines changed in a PR.
 
 Sometimes when working to get a repo to an acceptable level of code coverage, it can be hard to tell if one change is
 covered enough.  This plugin will look at just the lines changed in the PR and report code coverage for only those
@@ -22,7 +22,7 @@ Currently, this plugin supports two coverage file format.
 
 ### Jvm based projects
 For java/koltin based projects you need jacoco files that goes as an input to this plugin. How to generate jacoco files is outside the scope of
-this project. Once you have that jacoco file, you can pass that path to coverage_file parameters as shown in an example below
+this project. Once you have that jacoco file, you can pass that path to coverage_file parameter as shown  below
 
 ```yaml
 - name: check-pr-code-coverage
@@ -87,7 +87,11 @@ Once you have coverage.xml same can  be passed as an input to plugin shown below
 
 # Development
 
-This project needs  go (>= 1.17) to be  installed.
+This project needs  go (>= 1.17) to be  installed. Make sure you run
+* make format
+* make lint 
+
+ before submitting a PR
 
 # License
 This project is licensed under the Apache License, Version 2.0.
