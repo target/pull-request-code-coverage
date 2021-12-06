@@ -1,4 +1,4 @@
-module git.target.com/searchoss/pull-request-code-coverage
+module git.target.com/target/pull-request-code-coverage
 
 go 1.17
 

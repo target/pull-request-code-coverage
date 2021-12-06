@@ -1,8 +1,8 @@
 package calculator
 
 import (
-	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage"
-	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
+	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
+	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 	"github.com/sirupsen/logrus"
 )
 

@@ -6,9 +6,9 @@ import (
 	"io"
 	"strings"
 
-	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
-	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/pluginhttp"
-	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/pluginjson"
+	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
+	"git.target.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
+	"git.target.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
 	"github.com/pkg/errors"
 )
 

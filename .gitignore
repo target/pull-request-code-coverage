@@ -5,3 +5,4 @@ coverage.xml
 vendor/
 /plugin
 pull-request-code-coverage
+bin

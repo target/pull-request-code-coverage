@@ -49,10 +49,10 @@ steps:
         - pull_request
 
   - name : check-lint-on-pr
-    image: golangci/golangci-lint
+    image: hub.docker.target.com/golang:1.17
     pull: true
     commands:
-      - golangci-lint run
+      - make lint
     ruleset:
       event:
         - pull_request

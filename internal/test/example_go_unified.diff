@@ -21,7 +21,7 @@ index 0000000..1b77a7b
 +
 +workspace:
 +  base: /go
-+  path: src/git.target.com/searchoss/pull-request-code-coverage
++  path: src/git.target.com/target/pull-request-code-coverage
 +
 +pipeline:
 +
@@ -57,8 +57,8 @@ index 0000000..b8f15a5
 +RUN go get -u github.com/golang/dep/cmd/dep
 +RUN go get -u github.com/alecthomas/gometalinter
 +RUN gometalinter --install
-+COPY . /go/src/git.target.com/searchoss/pull-request-code-coverage
-+WORKDIR /go/src/git.target.com/searchoss/pull-request-code-coverage
++COPY . /go/src/git.target.com/target/pull-request-code-coverage
++WORKDIR /go/src/git.target.com/target/pull-request-code-coverage
 +RUN dep ensure
 +RUN go test -v -coverpkg=./... -coverprofile=coverage.txt ./...
 +RUN go tool cover -func=coverage.txt
@@ -68,7 +68,7 @@ index 0000000..b8f15a5
 +FROM alpine:latest
 +RUN apk --no-cache add ca-certificates git
 +WORKDIR /root/
-+COPY --from=0 /go/src/git.target.com/searchoss/pull-request-code-coverage/plugin .
++COPY --from=0 /go/src/git.target.com/target/pull-request-code-coverage/plugin .
 +COPY scripts/start.sh .
 +CMD ["./start.sh"]
 \ No newline at end of file
@@ -206,8 +206,8 @@ index 0000000..92e8dc7
 +
 +import (
 +	"fmt"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 +	"github.com/pkg/errors"
 +	"strings"
 +)
@@ -262,8 +262,8 @@ index 0000000..27ed6c3
 +
 +import (
 +	"encoding/xml"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 +	"io"
 +	"io/ioutil"
 +	"os"
@@ -410,8 +410,8 @@ index 0000000..33604dc
 +
 +import (
 +	"encoding/xml"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 +	"github.com/pkg/errors"
 +	"io"
 +	"io/ioutil"
@@ -572,7 +572,7 @@ index 0000000..4bdfea9
 @@ -0,0 +1,12 @@
 +package coverage
 +
-+import "git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
++import "git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 +
 +type Loader interface {
 +	Load(coverageFile string) (Report, error)
@@ -668,7 +668,7 @@ index 0000000..bfa7f8c
 +
 +import (
 +	"fmt"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 +	"io"
 +	"log"
 +)
@@ -769,12 +769,12 @@ index 0000000..424f410
 +package plugin
 +
 +import (
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/calculator"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/cobertura"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/jacoco"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/reporter"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/calculator"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/cobertura"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/reporter"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff"
 +	"github.com/pkg/errors"
 +	"github.com/sirupsen/logrus"
 +	"io"
@@ -856,7 +856,7 @@ index 0000000..16eec8d
 +
 +import (
 +	"bytes"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/test/mocks"
++	"git.target.com/target/pull-request-code-coverage/internal/test/mocks"
 +	"github.com/stretchr/testify/assert"
 +	"os"
 +	"strconv"
@@ -924,7 +924,7 @@ index 0000000..16eec8d
 +	propGetter.On("GetProperty", "PLUGIN_COVERAGE_FILE").Return("../test/example_go_coverage.xml", true)
 +	propGetter.On("GetProperty", "PLUGIN_COVERAGE_TYPE").Return("cobertura", true)
 +	propGetter.On("GetProperty", "PLUGIN_DIFF_FIRST_NODE_IS_MODULE").Return("false", true)
-+	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("/go/git.target.com/searchoss/pull-request-code-coverage", true)
++	propGetter.On("GetProperty", "PLUGIN_SOURCE_DIR").Return("/go/git.target.com/target/pull-request-code-coverage", true)
 +
 +	var buf bytes.Buffer
 +
@@ -1177,7 +1177,7 @@ index 0000000..2b5b9c4
 +package sourcelines
 +
 +import (
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 +	"os"
 +)
 +
@@ -1194,7 +1194,7 @@ index 0000000..720c2d3
 +
 +import (
 +	"bufio"
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 +	"github.com/pkg/errors"
 +	"io"
 +	"regexp"
@@ -1385,9 +1385,9 @@ index 0000000..6628bc3
 +<!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
 +<coverage line-rate="0.9619565" branch-rate="0" lines-covered="177" lines-valid="184" branches-covered="0" branches-valid="0" complexity="0" version="" timestamp="1541793228625">
 +	<packages>
-+		<package name="git.target.com/searchoss/pull-request-code-coverage" line-rate="0" branch-rate="0" complexity="0" line-count="4" line-hits="0">
++		<package name="git.target.com/target/pull-request-code-coverage" line-rate="0" branch-rate="0" complexity="0" line-count="4" line-hits="0">
 +			<classes>
-+				<class name="-" filename="/go/git.target.com/searchoss/pull-request-code-coverage/main.go" line-rate="0" branch-rate="0" complexity="0" line-count="4" line-hits="0">
++				<class name="-" filename="/go/git.target.com/target/pull-request-code-coverage/main.go" line-rate="0" branch-rate="0" complexity="0" line-count="4" line-hits="0">
 +					<methods>
 +						<method name="main" signature="" line-rate="0" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1407,9 +1407,9 @@ index 0000000..6628bc3
 +				</class>
 +			</classes>
 +		</package>
-+		<package name="git.target.com/searchoss/pull-request-code-coverage/internal/plugin" line-rate="0.96428573" branch-rate="0" complexity="0" line-count="28" line-hits="27">
++		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin" line-rate="0.96428573" branch-rate="0" complexity="0" line-count="28" line-hits="27">
 +			<classes>
-+				<class name="-" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/runner.go" line-rate="0.75" branch-rate="0" complexity="0" line-count="4" line-hits="3">
++				<class name="-" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/runner.go" line-rate="0.75" branch-rate="0" complexity="0" line-count="4" line-hits="3">
 +					<methods>
 +						<method name="NewRunner" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1431,7 +1431,7 @@ index 0000000..6628bc3
 +						<line number="74" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="DefaultRunner" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/runner.go" line-rate="1" branch-rate="0" complexity="0" line-count="24" line-hits="24">
++				<class name="DefaultRunner" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/runner.go" line-rate="1" branch-rate="0" complexity="0" line-count="24" line-hits="24">
 +					<methods>
 +						<method name="Run" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1491,9 +1491,9 @@ index 0000000..6628bc3
 +				</class>
 +			</classes>
 +		</package>
-+		<package name="git.target.com/searchoss/pull-request-code-coverage/internal/plugin/calculator" line-rate="1" branch-rate="0" complexity="0" line-count="10" line-hits="10">
++		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/calculator" line-rate="1" branch-rate="0" complexity="0" line-count="10" line-hits="10">
 +			<classes>
-+				<class name="-" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/calculator/calculator.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
++				<class name="-" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/calculator/calculator.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
 +					<methods>
 +						<method name="NewCoverage" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1505,7 +1505,7 @@ index 0000000..6628bc3
 +						<line number="14" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="DefaultCoverage" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/calculator/calculator.go" line-rate="1" branch-rate="0" complexity="0" line-count="9" line-hits="9">
++				<class name="DefaultCoverage" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/calculator/calculator.go" line-rate="1" branch-rate="0" complexity="0" line-count="9" line-hits="9">
 +					<methods>
 +						<method name="DetermineCoverage" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1535,9 +1535,9 @@ index 0000000..6628bc3
 +				</class>
 +			</classes>
 +		</package>
-+		<package name="git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/golang" line-rate="0" branch-rate="0" complexity="0" line-count="2" line-hits="0">
++		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/golang" line-rate="0" branch-rate="0" complexity="0" line-count="2" line-hits="0">
 +			<classes>
-+				<class name="-" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/golang/report.go" line-rate="0" branch-rate="0" complexity="0" line-count="1" line-hits="0">
++				<class name="-" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/golang/report.go" line-rate="0" branch-rate="0" complexity="0" line-count="1" line-hits="0">
 +					<methods>
 +						<method name="NewReportLoader" signature="" line-rate="0" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1549,7 +1549,7 @@ index 0000000..6628bc3
 +						<line number="14" hits="0"></line>
 +					</lines>
 +				</class>
-+				<class name="DefaultLoader" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/golang/report.go" line-rate="0" branch-rate="0" complexity="0" line-count="1" line-hits="0">
++				<class name="DefaultLoader" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/golang/report.go" line-rate="0" branch-rate="0" complexity="0" line-count="1" line-hits="0">
 +					<methods>
 +						<method name="Load" signature="" line-rate="0" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1563,9 +1563,9 @@ index 0000000..6628bc3
 +				</class>
 +			</classes>
 +		</package>
-+		<package name="git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/jacoco" line-rate="1" branch-rate="0" complexity="0" line-count="29" line-hits="29">
++		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco" line-rate="1" branch-rate="0" complexity="0" line-count="29" line-hits="29">
 +			<classes>
-+				<class name="DefaultLoader" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="11" line-hits="11">
++				<class name="DefaultLoader" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="11" line-hits="11">
 +					<methods>
 +						<method name="Load" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1597,7 +1597,7 @@ index 0000000..6628bc3
 +						<line number="51" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="Report" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
++				<class name="Report" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
 +					<methods>
 +						<method name="Name" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1621,7 +1621,7 @@ index 0000000..6628bc3
 +						<line number="71" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="Package" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="4" line-hits="4">
++				<class name="Package" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="4" line-hits="4">
 +					<methods>
 +						<method name="GetCoverageData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1639,7 +1639,7 @@ index 0000000..6628bc3
 +						<line number="88" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="SourceFile" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
++				<class name="SourceFile" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
 +					<methods>
 +						<method name="GetCoverageData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1659,7 +1659,7 @@ index 0000000..6628bc3
 +						<line number="106" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="CoverageData" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
++				<class name="CoverageData" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
 +					<methods>
 +						<method name="toDomain" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1671,7 +1671,7 @@ index 0000000..6628bc3
 +						<line number="122" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="-" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="3" line-hits="3">
++				<class name="-" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco/report.go" line-rate="1" branch-rate="0" complexity="0" line-count="3" line-hits="3">
 +					<methods>
 +						<method name="NewReportLoader" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1693,9 +1693,9 @@ index 0000000..6628bc3
 +				</class>
 +			</classes>
 +		</package>
-+		<package name="git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain" line-rate="1" branch-rate="0" complexity="0" line-count="19" line-hits="19">
++		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/domain" line-rate="1" branch-rate="0" complexity="0" line-count="19" line-hits="19">
 +			<classes>
-+				<class name="SourceLineCoverageReport" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain/domain.go" line-rate="1" branch-rate="0" complexity="0" line-count="18" line-hits="18">
++				<class name="SourceLineCoverageReport" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/domain/domain.go" line-rate="1" branch-rate="0" complexity="0" line-count="18" line-hits="18">
 +					<methods>
 +						<method name="TotalLinesWithData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1753,7 +1753,7 @@ index 0000000..6628bc3
 +						<line number="46" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="SourceLineCoverage" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain/domain.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
++				<class name="SourceLineCoverage" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/domain/domain.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
 +					<methods>
 +						<method name="HasData" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1767,9 +1767,9 @@ index 0000000..6628bc3
 +				</class>
 +			</classes>
 +		</package>
-+		<package name="git.target.com/searchoss/pull-request-code-coverage/internal/plugin/reporter" line-rate="1" branch-rate="0" complexity="0" line-count="25" line-hits="25">
++		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/reporter" line-rate="1" branch-rate="0" complexity="0" line-count="25" line-hits="25">
 +			<classes>
-+				<class name="-" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/reporter/reporter.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
++				<class name="-" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/reporter/reporter.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
 +					<methods>
 +						<method name="NewSimple" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1797,7 +1797,7 @@ index 0000000..6628bc3
 +						<line number="60" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="Simple" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/reporter/reporter.go" line-rate="1" branch-rate="0" complexity="0" line-count="20" line-hits="20">
++				<class name="Simple" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/reporter/reporter.go" line-rate="1" branch-rate="0" complexity="0" line-count="20" line-hits="20">
 +					<methods>
 +						<method name="Write" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1857,9 +1857,9 @@ index 0000000..6628bc3
 +				</class>
 +			</classes>
 +		</package>
-+		<package name="git.target.com/searchoss/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff" line-rate="1" branch-rate="0" complexity="0" line-count="64" line-hits="64">
++		<package name="git.target.com/target/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff" line-rate="1" branch-rate="0" complexity="0" line-count="64" line-hits="64">
 +			<classes>
-+				<class name="-" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff/changed_source_loader.go" line-rate="1" branch-rate="0" complexity="0" line-count="59" line-hits="59">
++				<class name="-" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff/changed_source_loader.go" line-rate="1" branch-rate="0" complexity="0" line-count="59" line-hits="59">
 +					<methods>
 +						<method name="NewChangedSourceLinesLoader" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -1991,7 +1991,7 @@ index 0000000..6628bc3
 +						<line number="145" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="Loader" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff/changed_source_loader.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
++				<class name="Loader" filename="/go/git.target.com/target/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff/changed_source_loader.go" line-rate="1" branch-rate="0" complexity="0" line-count="5" line-hits="5">
 +					<methods>
 +						<method name="Load" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -2013,9 +2013,9 @@ index 0000000..6628bc3
 +				</class>
 +			</classes>
 +		</package>
-+		<package name="git.target.com/searchoss/pull-request-code-coverage/internal/test/mocks" line-rate="1" branch-rate="0" complexity="0" line-count="3" line-hits="3">
++		<package name="git.target.com/target/pull-request-code-coverage/internal/test/mocks" line-rate="1" branch-rate="0" complexity="0" line-count="3" line-hits="3">
 +			<classes>
-+				<class name="-" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/test/mocks/property_getter.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
++				<class name="-" filename="/go/git.target.com/target/pull-request-code-coverage/internal/test/mocks/property_getter.go" line-rate="1" branch-rate="0" complexity="0" line-count="1" line-hits="1">
 +					<methods>
 +						<method name="NewMockPropertyGetter" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -2027,7 +2027,7 @@ index 0000000..6628bc3
 +						<line number="10" hits="1"></line>
 +					</lines>
 +				</class>
-+				<class name="MockPropertyGetter" filename="/go/git.target.com/searchoss/pull-request-code-coverage/internal/test/mocks/property_getter.go" line-rate="1" branch-rate="0" complexity="0" line-count="2" line-hits="2">
++				<class name="MockPropertyGetter" filename="/go/git.target.com/target/pull-request-code-coverage/internal/test/mocks/property_getter.go" line-rate="1" branch-rate="0" complexity="0" line-count="2" line-hits="2">
 +					<methods>
 +						<method name="GetProperty" signature="" line-rate="1" branch-rate="0" complexity="0" line-count="0" line-hits="0">
 +							<lines>
@@ -2074,7 +2074,7 @@ index 0000000..740214e
 ++
 ++workspace:
 ++  base: /go
-++  path: src/git.target.com/searchoss/pull-request-code-coverage
+++  path: src/git.target.com/target/pull-request-code-coverage
 ++
 ++pipeline:
 ++
@@ -2110,8 +2110,8 @@ index 0000000..740214e
 ++RUN go get -u github.com/golang/dep/cmd/dep
 ++RUN go get -u github.com/alecthomas/gometalinter
 ++RUN gometalinter --install
-++COPY . /go/src/git.target.com/searchoss/pull-request-code-coverage
-++WORKDIR /go/src/git.target.com/searchoss/pull-request-code-coverage
+++COPY . /go/src/git.target.com/target/pull-request-code-coverage
+++WORKDIR /go/src/git.target.com/target/pull-request-code-coverage
 ++RUN dep ensure
 ++RUN go test -v -coverpkg=./... -coverprofile=coverage.txt ./...
 ++RUN go tool cover -func=coverage.txt
@@ -2121,7 +2121,7 @@ index 0000000..740214e
 ++FROM alpine:latest
 ++RUN apk --no-cache add ca-certificates git
 ++WORKDIR /root/
-++COPY --from=0 /go/src/git.target.com/searchoss/pull-request-code-coverage/plugin .
+++COPY --from=0 /go/src/git.target.com/target/pull-request-code-coverage/plugin .
 ++COPY scripts/start.sh .
 ++CMD ["./start.sh"]
 +\ No newline at end of file
@@ -2259,8 +2259,8 @@ index 0000000..740214e
 ++
 ++import (
 ++	"fmt"
-++	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage"
-++	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
+++	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
+++	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 ++	"github.com/pkg/errors"
 ++	"strings"
 ++)
@@ -2315,8 +2315,8 @@ index 0000000..740214e
 ++
 ++import (
 ++	"encoding/xml"
-++	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/coverage"
-++	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin/domain"
+++	"git.target.com/target/pull-request-code-coverage/internal/plugin/coverage"
+++	"git.target.com/target/pull-request-code-coverage/internal/plugin/domain"
 ++	"io"
 ++	"io/ioutil"
 ++	"os"
@@ -2576,7 +2576,7 @@ index 0000000..10dae0f
 +package main
 +
 +import (
-+	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin"
++	"git.target.com/target/pull-request-code-coverage/internal/plugin"
 +	log "github.com/sirupsen/logrus"
 +	"os"
 +)

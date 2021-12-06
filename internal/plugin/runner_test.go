@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"testing"
 
-	"git.target.com/searchoss/pull-request-code-coverage/internal/test/mocks"
+	"git.target.com/target/pull-request-code-coverage/internal/test/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -75,7 +75,7 @@ func TestDefaultRunner_Run_GoExample_WithSourceDir(t *testing.T) {
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/example_go_coverage_with_source_dir.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("cobertura", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
-		propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("/go/git.target.com/searchoss/pull-request-code-coverage", true)
+		propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("/go/git.target.com/target/pull-request-code-coverage", true)
 		propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("SOME_API_KEY", true)
 		propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return(mockServerURL, true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
@@ -146,7 +146,7 @@ func TestDefaultRunner_Run_GoExample(t *testing.T) {
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/example_go_coverage.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("cobertura", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
-		propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("/go/git.target.com/searchoss/pull-request-code-coverage", true)
+		propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("/go/git.target.com/target/pull-request-code-coverage", true)
 		propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("SOME_API_KEY", true)
 		propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return(mockServerURL, true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)

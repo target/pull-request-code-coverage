@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"git.target.com/searchoss/pull-request-code-coverage/internal/plugin"
+	"git.target.com/target/pull-request-code-coverage/internal/plugin"
 	log "github.com/sirupsen/logrus"
 )
 

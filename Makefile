@@ -3,6 +3,7 @@ GO_PKGS=$(shell go list ./... | grep -v -e "/resources")
 
 format: check-gofmt
 
+
 check-gofmt:
 	@echo "Checking formatting..."
 	@FMT="0"; \
@@ -19,3 +20,11 @@ check-gofmt:
 	else \
 		echo "Success - way to run gofmt!"; \
 	fi
+
+bin/golangci-lint:
+	mkdir -p bin
+	wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.24.0
+
+.PHONY: lint
+lint: bin/golangci-lint
+	bin/golangci-lint run ./...
