@@ -59,7 +59,10 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 
 	ghAPIKey, ghAPIKeyFound := propertyGetter("PARAMETER_GH_API_KEY")
 	if !ghAPIKeyFound {
-		logrus.Info("PARAMETER_GH_API_KEY was missing, will not send report to PR comments")
+		ghAPIKey, ghAPIKeyFound = propertyGetter("PLUGIN_GH_API_KEY")
+		if !ghAPIKeyFound {
+			logrus.Info("PARAMETER_GH_API_KEY/PLUGIN_GH_API_KEY was missing, will not send report to PR comments")
+		}
 	}
 
 	ghAPIBaseURL, ghAPIBaseURLFound := propertyGetter("PARAMETER_GH_API_BASE_URL")
