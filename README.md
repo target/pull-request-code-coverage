@@ -1,22 +1,27 @@
 
 # pull-request-code-coverage
 
-[![Build Status](https://vela-server.prod.target.com/badge/TargetOSS/pull-request-code-coverage/status.svg)](https://vela.prod.target.com/TargetOSS/pull-request-code-coverage)
 
-[Vela](https://go-vela.github.io/docs/) plugin to allow detecting code coverage for only the lines changed in a PR.
+A continuous integration plugin to allow detecting code coverage for only the lines changed in a PR.
 
 Sometimes when working to get a repo to an acceptable level of code coverage, it can be hard to tell if one change is
 covered enough.  This plugin will look at just the lines changed in the PR and report code coverage for only those
 lines.
 
-This plugin will output the coverage details to the vela step's console, as well as has the ability to comment on the
-PR with a summary of the coverage details.
+This plugin will output the coverage details to the CI/CD step's console. A  sample [Vela](https://github.com/go-vela) step console 
+
+![ ](./images/vela-step-console-pr-code-coverage.png)
+
+
+This plugin  as well as has the ability to comment on the PR with a summary of the coverage details.
+![ ](./images/github_pr_coverage.png)
+
 
 Currently, this plugin supports two coverage file format.
 * jacoco for jvm based languages like java,kotlin,scala
 * cobertura can be used for golang projects using [gocov-xml](https://github.com/AlekSi/gocov-xml) utility
 
-
+This plugin works out of box  for [Vela](https://github.com/go-vela),a CI/CD open-sourced by target
 
 ## VELA Usage
 
