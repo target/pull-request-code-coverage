@@ -1,0 +1,24 @@
+name: release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  docker:
+    environment: deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Docker Build and Push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            target/pull-request-code-coverage:lastest
+            target/pull-request-code-coverage:${{ github.event.release.tag_name }}
