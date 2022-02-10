@@ -12,7 +12,7 @@ import (
 func Test_silentlyCall(t *testing.T) {
 	assert.Panics(t, func() {
 		silentlyCall(func() error {
-			return errors.New("anuthing")
+			return errors.New("anything")
 		})
 	})
 }
