@@ -22,8 +22,8 @@ module="${PARAMETER_MODULE:-}"
 PARAMETER_RUN_DIR="${PARAMETER_RUN_DIR:-}"
 branch="${VELA_PULL_REQUEST_TARGET:-}"
 
-git config --global user.name "drone"
-git config --global user.email "drone@drone.shipt.com"
+git config --global user.name "vela"
+git config --global user.email "vela@xyz.com"
 
 
 git fetch --no-tags origin  "$branch"

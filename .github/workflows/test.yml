@@ -22,5 +22,5 @@ jobs:
     - name: check-format-on-pr
       run: make format
 
-    - name: check-link-on-pr
+    - name: check-lint-on-pr
       run: make lint
