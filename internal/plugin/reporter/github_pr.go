@@ -50,7 +50,7 @@ func (s *GithubPullRequest) Write(changedLinesWithCoverage domain.SourceLineCove
 		return errors.Wrap(bodyErr, "Failed creating payload for github")
 	}
 
-	url := fmt.Sprintf("%v/api/v3/repos/%v/%v/issues/%v/comments", s.apiBaseURL, s.owner, s.repo, s.pr)
+	url := fmt.Sprintf("%v/repos/%v/%v/issues/%v/comments", strings.TrimRight(s.apiBaseURL, "/"), s.owner, s.repo, s.pr)
 
 	req, newErr := s.httpClient.NewRequest(
 		"POST",
