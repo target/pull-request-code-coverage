@@ -22,5 +22,5 @@ jobs:
         with:
           push: true
           tags: |
-            pullrequestcc/pull-request-code-coverage:latest
-            pullrequestcc/pull-request-code-coverage:${{ github.event.release.tag_name }}
+            ${{ secrets.DOCKER_REPO }}/pull-request-code-coverage:latest
+            ${{ secrets.DOCKER_REPO }}/pull-request-code-coverage:${{ github.event.release.tag_name }}
