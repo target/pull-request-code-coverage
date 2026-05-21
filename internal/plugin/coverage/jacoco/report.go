@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 
 	"io"
-	"io/ioutil"
 
 	"log"
 	"os"
@@ -20,12 +19,12 @@ type DefaultLoader struct {
 
 func NewReportLoader() *DefaultLoader {
 	return &DefaultLoader{
-		readAllFunc: ioutil.ReadAll,
+		readAllFunc: io.ReadAll,
 	}
 }
 
 func (l *DefaultLoader) Load(coverageFile string) (coverage.Report, error) {
-	// nolint: gosec
+	// nolint: gosec // coverageFile is a user-supplied report path; opening it is the intended behavior
 	xmlFile, openFileErr := os.Open(coverageFile)
 
 	if openFileErr != nil {
@@ -96,7 +95,7 @@ type SourceFile struct {
 func (f SourceFile) GetCoverageData(lineNumber int) (*domain.CoverageData, bool) {
 	for _, l := range f.Lines {
 		if l.LineNumber == lineNumber {
-			coverageData := l.CoverageData.toDomain()
+			coverageData := l.toDomain()
 			return &coverageData, true
 		}
 	}

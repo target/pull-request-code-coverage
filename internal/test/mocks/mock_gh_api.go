@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -84,7 +83,7 @@ func mustJSONUnmarshall(bytes []byte, result interface{}) {
 }
 
 func mustReadAll(r io.Reader) []byte {
-	result, err := ioutil.ReadAll(r)
+	result, err := io.ReadAll(r)
 
 	if err != nil {
 		panic(fmt.Sprintf("Unexpected error: %v", err))

@@ -92,7 +92,7 @@ Once you have coverage.xml same can  be passed as an input to plugin shown below
 
 # Development
 
-This project needs  go (>= 1.17) to be  installed. Make sure you run
+This project needs  go (>= 1.26.3) to be  installed. Make sure you run
 * make format
 * make lint 
 
