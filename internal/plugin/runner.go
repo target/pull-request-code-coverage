@@ -18,6 +18,11 @@ import (
 	"github.com/target/pull-request-code-coverage/internal/plugin/sourcelines/unifieddiff"
 )
 
+// defaultGithubAPIBaseURL is the public GitHub REST API root. GitHub Enterprise
+// users should set PARAMETER_GH_API_BASE_URL to their API root (e.g.
+// https://git.example.com/api/v3).
+const defaultGithubAPIBaseURL = "https://api.github.com"
+
 type DefaultRunner struct{}
 
 func NewRunner() *DefaultRunner {
@@ -27,6 +32,8 @@ func NewRunner() *DefaultRunner {
 // Run ...
 // nolint: gocyclo
 func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSourceLinesSource io.Reader, reportDefaultOut io.Writer) error {
+
+	logrus.Info("starting pull-request-code-coverage run")
 
 	rawSourceDirs, found := propertyGetter("PARAMETER_SOURCE_DIRS")
 	if !found {
@@ -66,8 +73,9 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 	}
 
 	ghAPIBaseURL, ghAPIBaseURLFound := propertyGetter("PARAMETER_GH_API_BASE_URL")
-	if !ghAPIBaseURLFound {
-		logrus.Info("PARAMETER_GH_API_BASE_URL was missing, will not send report to PR comments")
+	if !ghAPIBaseURLFound || ghAPIBaseURL == "" {
+		ghAPIBaseURL = defaultGithubAPIBaseURL
+		logrus.Info(fmt.Sprintf("PARAMETER_GH_API_BASE_URL was missing, defaulting to %v", ghAPIBaseURL))
 	}
 
 	repoPR, repoPRFound := propertyGetter("BUILD_PULL_REQUEST_NUMBER")
@@ -112,7 +120,7 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 
 	reporters := []reporter.Reporter{reporter.NewSimple(reportDefaultOut)}
 
-	if ghAPIKeyFound && ghAPIBaseURLFound && repoPRFound && repoOwnerFound && repoNameFound {
+	if ghAPIKeyFound && repoPRFound && repoOwnerFound && repoNameFound {
 		reporters = append(reporters, reporter.NewGithubPullRequest(ghAPIKey, ghAPIBaseURL, repoPR, repoOwner, repoName, &pluginhttp.DefaultClient{}, &pluginjson.DefaultClient{}))
 	}
 	logrus.Info("enabled reporters are ")

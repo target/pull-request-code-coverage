@@ -1,0 +1,70 @@
+name: pr-code-coverage
+
+# Dogfoods this plugin on its own PRs: builds the plugin image from the PR
+# source, computes coverage for only the lines changed in the PR, and posts a
+# summary comment on the PR.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write # required so the plugin can post the coverage comment
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    # Fork PRs only get a read-only GITHUB_TOKEN (can't comment) and no secrets,
+    # so restrict to same-repo PRs to avoid a guaranteed failure on forks.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need the base branch present to diff against it
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.3
+
+      - name: Generate coverage profile
+        run: go test -coverpkg=./... -coverprofile=coverage.txt ./...
+
+      - name: Convert coverage to cobertura
+        # go run leaves no installed binary; boumenot emits <source> as the
+        # absolute build dir (== github.workspace) and class filenames relative
+        # to the module root, which is what PARAMETER_SOURCE_DIRS matches against.
+        run: go run github.com/boumenot/gocover-cobertura@v1.5.0 < coverage.txt > coverage.xml
+
+      - name: Build plugin image
+        # The published :latest image predates the public-github.com base-URL fix,
+        # so build from the PR source to test the exact code under review.
+        run: docker build -t pr-code-coverage:ci .
+
+      - name: Report coverage on changed lines
+        env:
+          PARAMETER_COVERAGE_TYPE: cobertura
+          PARAMETER_COVERAGE_FILE: coverage.xml
+          # Must equal the cobertura <source> path (the dir go test ran in).
+          PARAMETER_SOURCE_DIRS: ${{ github.workspace }}
+          # Omit PARAMETER_GH_API_BASE_URL -> defaults to https://api.github.com.
+          PARAMETER_GH_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY_ORG: ${{ github.repository_owner }}
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+        run: |
+          git fetch --no-tags origin "${{ github.base_ref }}"
+          git --no-pager diff --unified=0 "origin/${{ github.base_ref }}" -- '*.go' \
+            | docker run --rm -i \
+                -e PARAMETER_COVERAGE_TYPE \
+                -e PARAMETER_COVERAGE_FILE \
+                -e PARAMETER_SOURCE_DIRS \
+                -e PARAMETER_GH_API_KEY \
+                -e BUILD_PULL_REQUEST_NUMBER \
+                -e REPOSITORY_ORG \
+                -e REPOSITORY_NAME \
+                -v "${{ github.workspace }}:${{ github.workspace }}" \
+                -w "${{ github.workspace }}" \
+                --entrypoint /plugin \
+                pr-code-coverage:ci

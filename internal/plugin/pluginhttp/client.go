@@ -18,5 +18,6 @@ func (c *DefaultClient) NewRequest(method string, url string, body io.Reader) (*
 }
 
 func (c *DefaultClient) Do(request *http.Request) (*http.Response, error) {
+	// nolint: gosec // the request targets the user-configured GitHub API URL, which is the intended behavior
 	return http.DefaultClient.Do(request)
 }
