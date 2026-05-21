@@ -3,7 +3,6 @@ package cobertura
 import (
 	"encoding/xml"
 	"io"
-	"io/ioutil"
 
 	"log"
 	"os"
@@ -22,7 +21,7 @@ type DefaultLoader struct {
 
 func NewReportLoader(sourceDir string) *DefaultLoader {
 	return &DefaultLoader{
-		readAllFunc: ioutil.ReadAll,
+		readAllFunc: io.ReadAll,
 		sourceDir:   sourceDir,
 	}
 }

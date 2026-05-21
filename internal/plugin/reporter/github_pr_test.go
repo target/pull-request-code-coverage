@@ -1,8 +1,10 @@
 package reporter
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -66,7 +68,7 @@ func TestGithubPullRequest_Write_FailedDo_BadStatus(t *testing.T) {
 	request := httptest.NewRequest("GET", "http://anywhere", nil)
 
 	mockClient.On("NewRequest", mock.Anything, mock.Anything, mock.Anything).Return(request, nil)
-	mockClient.On("Do", request).Return(&http.Response{StatusCode: 400}, nil)
+	mockClient.On("Do", request).Return(&http.Response{StatusCode: 400, Body: io.NopCloser(strings.NewReader(""))}, nil)
 
 	writer := &GithubPullRequest{
 		apiBaseURL: "anything",
