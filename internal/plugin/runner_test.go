@@ -107,7 +107,7 @@ Covered Instructions        -> 97% (177)
 Missed Instructions         -> 3% (5)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+		requestAsserter.AssertRequestWasMade(t, "/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
 			"body": `## 📊 Code Coverage — Changed Lines
 
 > Coverage is measured **only for the lines this PR changes**, not the whole file or repo.
@@ -188,7 +188,7 @@ Covered Instructions        -> 97% (177)
 Missed Instructions         -> 3% (5)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+		requestAsserter.AssertRequestWasMade(t, "/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
 			"body": `## 📊 Code Coverage — Changed Lines
 
 > Coverage is measured **only for the lines this PR changes**, not the whole file or repo.
@@ -259,7 +259,7 @@ Covered Instructions        -> 73% (8)
 Missed Instructions         -> 27% (3)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+		requestAsserter.AssertRequestWasMade(t, "/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
 			"body": `## 📊 Code Coverage — Changed Lines
 
 > Coverage is measured **only for the lines this PR changes**, not the whole file or repo.
@@ -325,7 +325,7 @@ Covered Instructions        -> 73% (8)
 Missed Instructions         -> 27% (3)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+		requestAsserter.AssertRequestWasMade(t, "/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
 			"body": `## 📊 Code Coverage — Changed Lines
 
 > Coverage is measured **only for the lines this PR changes**, not the whole file or repo.
@@ -393,7 +393,7 @@ Covered Instructions        -> 88% (42)
 Missed Instructions         -> 12% (6)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+		requestAsserter.AssertRequestWasMade(t, "/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
 			"body": `## 📊 Code Coverage — Changed Lines
 
 > Coverage is measured **only for the lines this PR changes**, not the whole file or repo.
@@ -463,7 +463,7 @@ Covered Instructions        -> 88% (42)
 Missed Instructions         -> 12% (6)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
+		requestAsserter.AssertRequestWasMade(t, "/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
 			"body": `## 📊 Code Coverage — Changed Lines
 
 > Coverage is measured **only for the lines this PR changes**, not the whole file or repo.
