@@ -67,7 +67,8 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 
 	ghAPIBaseURL, ghAPIBaseURLFound := propertyGetter("PARAMETER_GH_API_BASE_URL")
 	if !ghAPIBaseURLFound {
-		logrus.Info("PARAMETER_GH_API_BASE_URL was missing, will not send report to PR comments")
+		ghAPIBaseURL = reporter.DefaultGithubAPIBaseURL
+		logrus.Info(fmt.Sprintf("PARAMETER_GH_API_BASE_URL was missing, defaulting to %v", reporter.DefaultGithubAPIBaseURL))
 	}
 
 	repoPR, repoPRFound := propertyGetter("BUILD_PULL_REQUEST_NUMBER")
@@ -112,7 +113,7 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 
 	reporters := []reporter.Reporter{reporter.NewSimple(reportDefaultOut)}
 
-	if ghAPIKeyFound && ghAPIBaseURLFound && repoPRFound && repoOwnerFound && repoNameFound {
+	if ghAPIKeyFound && repoPRFound && repoOwnerFound && repoNameFound {
 		reporters = append(reporters, reporter.NewGithubPullRequest(ghAPIKey, ghAPIBaseURL, repoPR, repoOwner, repoName, &pluginhttp.DefaultClient{}, &pluginjson.DefaultClient{}))
 	}
 	logrus.Info("enabled reporters are ")

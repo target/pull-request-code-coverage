@@ -107,29 +107,14 @@ Covered Instructions        -> 97% (177)
 Missed Instructions         -> 3% (5)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
-			"body": `Code Coverage Summary:
-
-Lines Without Coverage Data -> 92% (2216)
-Lines With Coverage Data    -> 8% (182)
-Covered Instructions        -> **97%** (177)
-Missed Instructions         -> 3% (5)
-
-<details><summary>Missed Instructions summary</summary>
-
-` + "```" + `
---- internal/plugin/runner.go:72
-func GetCoverageReportLoader(coverageType string, sourceDir string) coverage.Loader {
---- main.go:10
-	err := plugin.NewRunner().Run(os.LookupEnv, os.Stdin, os.Stdout)
---- main.go:12
-	if err != nil {
---- main.go:13
-		log.WithFields(log.Fields{
---- main.go:17
-		os.Exit(1)
-` +
-				"```\n</details>",
+		requestAsserter.AssertRequestBodyContains(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", []string{
+			"## 📊 Pull Request Code Coverage",
+			"| ✅ Covered instructions | **97%** | 177 |",
+			"| ❌ Missed instructions | 3% | 5 |",
+			"What do these metrics mean?",
+			"❌ Lines missing coverage (5)",
+			"`internal/plugin/runner.go:72`",
+			"```go",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -178,29 +163,14 @@ Covered Instructions        -> 97% (177)
 Missed Instructions         -> 3% (5)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
-			"body": `Code Coverage Summary:
-
-Lines Without Coverage Data -> 92% (2216)
-Lines With Coverage Data    -> 8% (182)
-Covered Instructions        -> **97%** (177)
-Missed Instructions         -> 3% (5)
-
-<details><summary>Missed Instructions summary</summary>
-
-` + "```" + `
---- internal/plugin/runner.go:72
-func GetCoverageReportLoader(coverageType string, sourceDir string) coverage.Loader {
---- main.go:10
-	err := plugin.NewRunner().Run(os.LookupEnv, os.Stdin, os.Stdout)
---- main.go:12
-	if err != nil {
---- main.go:13
-		log.WithFields(log.Fields{
---- main.go:17
-		os.Exit(1)
-` +
-				"```\n</details>",
+		requestAsserter.AssertRequestBodyContains(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", []string{
+			"## 📊 Pull Request Code Coverage",
+			"| ✅ Covered instructions | **97%** | 177 |",
+			"| ❌ Missed instructions | 3% | 5 |",
+			"What do these metrics mean?",
+			"❌ Lines missing coverage (5)",
+			"`internal/plugin/runner.go:72`",
+			"```go",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -239,23 +209,13 @@ Covered Instructions        -> 73% (8)
 Missed Instructions         -> 27% (3)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
-			"body": `*Modules: category-search*
-
-Code Coverage Summary:
-
-Lines Without Coverage Data -> 78% (7)
-Lines With Coverage Data    -> 22% (2)
-Covered Instructions        -> **73%** (8)
-Missed Instructions         -> 27% (3)
-
-<details><summary>Missed Instructions summary</summary>
-
-` + "```" + `
---- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
-    System.out.print("Something");
-` +
-				"```\n</details>",
+		requestAsserter.AssertRequestBodyContains(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", []string{
+			"**Modules:** `category-search`",
+			"| ✅ Covered instructions | **73%** | 8 |",
+			"| ❌ Missed instructions | 27% | 3 |",
+			"What do these metrics mean?",
+			"category-search/src/main/java/com/tgt/CategorySearchApplication.java:52",
+			"```java",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -295,23 +255,13 @@ Covered Instructions        -> 73% (8)
 Missed Instructions         -> 27% (3)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
-			"body": `*Modules: category-search*
-
-Code Coverage Summary:
-
-Lines Without Coverage Data -> 78% (7)
-Lines With Coverage Data    -> 22% (2)
-Covered Instructions        -> **73%** (8)
-Missed Instructions         -> 27% (3)
-
-<details><summary>Missed Instructions summary</summary>
-
-` + "```" + `
---- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
-    System.out.print("Something");
-` +
-				"```\n</details>",
+		requestAsserter.AssertRequestBodyContains(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", []string{
+			"**Modules:** `category-search`",
+			"| ✅ Covered instructions | **73%** | 8 |",
+			"| ❌ Missed instructions | 27% | 3 |",
+			"What do these metrics mean?",
+			"category-search/src/main/java/com/tgt/CategorySearchApplication.java:52",
+			"```java",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -353,24 +303,12 @@ Covered Instructions        -> 88% (42)
 Missed Instructions         -> 12% (6)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
-			"body": `*Modules: category-search*
-
-Code Coverage Summary:
-
-Lines Without Coverage Data -> 47% (7)
-Lines With Coverage Data    -> 53% (8)
-Covered Instructions        -> **88%** (42)
-Missed Instructions         -> 12% (6)
-
-<details><summary>Missed Instructions summary</summary>
-
-` + "```" + `
---- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
-    System.out.print("Something");
---- category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12
-    System.out.print("Something2");
-` + "```\n</details>",
+		requestAsserter.AssertRequestBodyContains(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", []string{
+			"**Modules:** `category-search`",
+			"| ✅ Covered instructions | **88%** | 42 |",
+			"| ❌ Missed instructions | 12% | 6 |",
+			"category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12",
+			"```kotlin",
 		})
 
 		propGetter.AssertExpectations(t)
@@ -413,25 +351,12 @@ Covered Instructions        -> 88% (42)
 Missed Instructions         -> 12% (6)
 `, buf.String())
 
-		requestAsserter.AssertRequestWasMade(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", map[string]interface{}{
-			"body": `*Modules: category-search*
-
-Code Coverage Summary:
-
-Lines Without Coverage Data -> 47% (7)
-Lines With Coverage Data    -> 53% (8)
-Covered Instructions        -> **88%** (42)
-Missed Instructions         -> 12% (6)
-
-<details><summary>Missed Instructions summary</summary>
-
-` + "```" + `
---- category-search/src/main/java/com/tgt/CategorySearchApplication.java:52
-    System.out.print("Something");
---- category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12
-    System.out.print("Something2");
-` +
-				"```\n</details>",
+		requestAsserter.AssertRequestBodyContains(t, "/api/v3/repos/some_org/some_repo/issues/123/comments", "SOME_API_KEY", []string{
+			"**Modules:** `category-search`",
+			"| ✅ Covered instructions | **88%** | 42 |",
+			"| ❌ Missed instructions | 12% | 6 |",
+			"category-search/src/main/kotlin/com/tgt/SomeOtherClass.kt:12",
+			"```kotlin",
 		})
 
 		propGetter.AssertExpectations(t)
