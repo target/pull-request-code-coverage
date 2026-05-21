@@ -41,7 +41,9 @@ this project. Once you have that jacoco file, you can pass that path to coverage
      source_dirs:
        - src/main/java
        - src/main/kotlin
-     gh_api_base_url: https://git.target.com
+     # omit for public github.com (defaults to https://api.github.com)
+     # for GitHub Enterprise, use the full API root including /api/v3
+     gh_api_base_url: https://git.target.com/api/v3
      module: some-sub-module
    secrets:
      - source: pull_request_api_key
@@ -73,7 +75,9 @@ Once you have coverage.xml same can  be passed as an input to plugin shown below
      coverage_file: coverage.xml
      source_dirs:
        - /vela/src/github.com/targetOSS/pull-request-code-coverage
-     gh_api_base_url: https://git.target.com
+     # omit for public github.com (defaults to https://api.github.com)
+     # for GitHub Enterprise, use the full API root including /api/v3
+     gh_api_base_url: https://git.target.com/api/v3
    secrets:
      - source: pull_request_api_key
        target: plugin_gh_api_key
