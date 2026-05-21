@@ -23,6 +23,21 @@ Currently, this plugin supports two coverage file format.
 
 This plugin works out of box  for [Vela](https://github.com/go-vela),a CI/CD open-sourced by target
 
+## Docker image
+
+The plugin is published as a public Docker image to the GitHub Container Registry (GHCR) on every release:
+
+```
+ghcr.io/target/pull-request-code-coverage:latest
+ghcr.io/target/pull-request-code-coverage:<release-tag>
+```
+
+Pull it with:
+
+```
+docker pull ghcr.io/target/pull-request-code-coverage:latest
+```
+
 ## VELA Usage
 
 ### Jvm based projects
@@ -31,7 +46,7 @@ this project. Once you have that jacoco file, you can pass that path to coverage
 
 ```yaml
 - name: check-pr-code-coverage
-   image: docker.target.com/app/pull-request-code-coverage
+   image: ghcr.io/target/pull-request-code-coverage:latest
    pull: true
    ruleset:
      event: [pull_request]
@@ -65,7 +80,7 @@ Once you have coverage.xml same can  be passed as an input to plugin shown below
 
 ```yaml
 - name: check-pr-code-coverage
-   image: docker.target.com/app/pull-request-code-coverage
+   image: ghcr.io/target/pull-request-code-coverage:latest
    pull: true
    ruleset:
      event: [pull_request]
