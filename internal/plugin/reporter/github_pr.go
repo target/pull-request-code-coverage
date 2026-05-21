@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"net/url"
+	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -11,6 +14,11 @@ import (
 	"github.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
 	"github.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
 )
+
+// DefaultGithubAPIBaseURL is the REST API root for public GitHub. It is used
+// when no base URL is configured; GitHub Enterprise users override it via
+// gh_api_base_url (e.g. https://git.target.com).
+const DefaultGithubAPIBaseURL = "https://api.github.com"
 
 type GithubPullRequest struct {
 	apiKey     string
@@ -50,7 +58,7 @@ func (s *GithubPullRequest) Write(changedLinesWithCoverage domain.SourceLineCove
 		return errors.Wrap(bodyErr, "Failed creating payload for github")
 	}
 
-	url := fmt.Sprintf("%v/api/v3/repos/%v/%v/issues/%v/comments", s.apiBaseURL, s.owner, s.repo, s.pr)
+	url := s.commentsURL()
 
 	req, newErr := s.httpClient.NewRequest(
 		"POST",
@@ -63,6 +71,7 @@ func (s *GithubPullRequest) Write(changedLinesWithCoverage domain.SourceLineCove
 
 	req.Header.Add("Authorization", "token "+s.apiKey)
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("User-Agent", "pull-request-code-coverage")
 
 	resp, doErr := s.httpClient.Do(req)
 
@@ -77,55 +86,66 @@ func (s *GithubPullRequest) Write(changedLinesWithCoverage domain.SourceLineCove
 	return nil
 }
 
+// commentsURL builds the REST endpoint for posting an issue comment.
+//
+// Public GitHub (api.github.com) and Enterprise Cloud (api.*.ghe.com) serve the
+// REST API at the host root, while Enterprise Server (e.g. git.target.com)
+// serves it under /api/v3. We append /api/v3 only for the latter so existing
+// host-only Enterprise configs keep working without change.
+func (s *GithubPullRequest) commentsURL() string {
+	base := strings.TrimRight(s.apiBaseURL, "/")
+
+	if host := hostOf(base); !strings.HasPrefix(host, "api.") && !strings.HasSuffix(base, "/api/v3") {
+		base += "/api/v3"
+	}
+
+	return fmt.Sprintf("%v/repos/%v/%v/issues/%v/comments", base, s.owner, s.repo, s.pr)
+}
+
+// hostOf returns the host component of a URL, or "" if it cannot be parsed.
+func hostOf(rawURL string) string {
+	if u, err := url.Parse(rawURL); err == nil {
+		return u.Host
+	}
+
+	return ""
+}
+
 func (s *GithubPullRequest) GetName() string {
 	return "github pull request  reporter"
 }
 
+// metricsLegend explains, in plain language, what each row of the metrics
+// table means so readers of the PR comment don't have to guess.
+const metricsLegend = "<details><summary>ℹ️ What do these metrics mean?</summary>\n\n" +
+	"- **Covered instructions** — instructions (statements / bytecode) on the changed lines that were executed by your tests.\n" +
+	"- **Missed instructions** — instructions on the changed lines that were **not** executed by any test.\n" +
+	"- **Lines with coverage data** — changed lines the coverage tool tracks as executable code.\n" +
+	"- **Lines without coverage data** — changed lines with no coverage information (comments, blank lines, declarations, etc.).\n\n" +
+	"</details>\n"
+
 func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.SourceLineCoverageReport) (io.Reader, error) {
 
-	modules := collectModules(changedLinesWithCoverage)
+	var body strings.Builder
 
-	summaryLines := []string{}
+	body.WriteString("## 📊 Pull Request Code Coverage\n\n")
+	body.WriteString("Coverage below is for **only the lines changed in this PR**.\n\n")
 
-	if len(modules) > 0 {
-		summaryLines = append(summaryLines, fmt.Sprintf("*Modules: %v*\n\n", strings.Join(modules, ", ")))
-	}
-	var missedInstructions string
-
-	for _, r := range changedLinesWithCoverage {
-		if r.MissedInstructionCount > 0 {
-			missedInstructions += fmt.Sprintf("--- %v\n", lineDescription(r.SourceLine))
-			missedInstructions += fmt.Sprintf("%v\n", r.LineValue)
-		}
+	if modules := collectModules(changedLinesWithCoverage); len(modules) > 0 {
+		body.WriteString(fmt.Sprintf("**Modules:** %v\n\n", strings.Join(backtickEach(modules), ", ")))
 	}
 
-	summaryLines = append(summaryLines, generateSummaryLines(changedLinesWithCoverage, func(linesWithDataCount int, linesWithoutDataCount int, covered int, missed int) []string {
-		totalLines := linesWithDataCount + linesWithoutDataCount
-		totalInstructions := covered + missed
+	body.WriteString(metricsTable(changedLinesWithCoverage))
+	body.WriteString("\n")
+	body.WriteString(metricsLegend)
 
-		result := make([]string, 5)
-
-		result[0] = fmt.Sprintf("Code Coverage Summary:\n\n")
-		result[1] = fmt.Sprintf("Lines Without Coverage Data -> %.f%% (%d)\n", toPercent(safeDiv(float32(linesWithoutDataCount), float32(totalLines), 0)), linesWithoutDataCount)
-		result[2] = fmt.Sprintf("Lines With Coverage Data    -> %.f%% (%d)\n", toPercent(safeDiv(float32(linesWithDataCount), float32(totalLines), 1)), linesWithDataCount)
-		result[3] = fmt.Sprintf("Covered Instructions        -> **%.f%%** (%d)\n", toPercent(safeDiv(float32(covered), float32(totalInstructions), 1)), covered)
-		result[4] = fmt.Sprintf("Missed Instructions         -> %.f%% (%d)\n", toPercent(safeDiv(float32(missed), float32(totalInstructions), 0)), missed)
-
-		return result
-	})...)
-
-	var summary string
-	if missedInstructions == "" {
-		summary = strings.Join(summaryLines, "")
-	} else {
-
-		summaryWithoutInstructions := strings.Join(summaryLines, "")
-		summary = summaryWithoutInstructions + "\n<details><summary>Missed Instructions summary</summary>\n\n" + "```\n" + missedInstructions + "```" +
-			"\n</details>"
+	if details := missedInstructionsDetails(changedLinesWithCoverage); details != "" {
+		body.WriteString("\n")
+		body.WriteString(details)
 	}
 
 	data := map[string]string{
-		"body": summary,
+		"body": body.String(),
 	}
 
 	dataBytes, marshalErr := s.jsonClient.Marshal(data)
@@ -135,6 +155,85 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 	}
 
 	return bytes.NewBuffer(dataBytes), nil
+}
+
+// metricsTable renders the coverage numbers as a GitHub-flavoured markdown table.
+func metricsTable(changedLinesWithCoverage domain.SourceLineCoverageReport) string {
+	rows := generateSummaryLines(changedLinesWithCoverage, func(linesWithDataCount int, linesWithoutDataCount int, covered int, missed int) []string {
+		totalLines := linesWithDataCount + linesWithoutDataCount
+		totalInstructions := covered + missed
+
+		return []string{
+			"| Metric | Coverage | Count |\n",
+			"|:---|---:|---:|\n",
+			fmt.Sprintf("| ✅ Covered instructions | **%.f%%** | %d |\n", toPercent(safeDiv(float32(covered), float32(totalInstructions), 1)), covered),
+			fmt.Sprintf("| ❌ Missed instructions | %.f%% | %d |\n", toPercent(safeDiv(float32(missed), float32(totalInstructions), 0)), missed),
+			fmt.Sprintf("| 📈 Lines with coverage data | %.f%% | %d |\n", toPercent(safeDiv(float32(linesWithDataCount), float32(totalLines), 1)), linesWithDataCount),
+			fmt.Sprintf("| 📉 Lines without coverage data | %.f%% | %d |\n", toPercent(safeDiv(float32(linesWithoutDataCount), float32(totalLines), 0)), linesWithoutDataCount),
+		}
+	})
+
+	return strings.Join(rows, "")
+}
+
+// missedInstructionsDetails renders a collapsible section listing each changed
+// line that has missed instructions, with its source in a syntax-highlighted
+// block. Returns "" when nothing was missed.
+func missedInstructionsDetails(changedLinesWithCoverage domain.SourceLineCoverageReport) string {
+	var missed []domain.SourceLineCoverage
+	for _, r := range changedLinesWithCoverage {
+		if r.MissedInstructionCount > 0 {
+			missed = append(missed, r)
+		}
+	}
+
+	if len(missed) == 0 {
+		return ""
+	}
+
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("<details><summary>❌ Lines missing coverage (%d)</summary>\n\n", len(missed)))
+
+	for _, r := range missed {
+		b.WriteString(fmt.Sprintf("**`%v`**\n", lineDescription(r.SourceLine)))
+		b.WriteString(fmt.Sprintf("```%v\n%v\n```\n\n", langForFile(r.FileName), r.LineValue))
+	}
+
+	b.WriteString("</details>\n")
+
+	return b.String()
+}
+
+// langForFile maps a source file's extension to a markdown code-fence language
+// so missed-line snippets get syntax highlighting. Unknown types render plain.
+func langForFile(fileName string) string {
+	switch strings.ToLower(filepath.Ext(fileName)) {
+	case ".go":
+		return "go"
+	case ".java":
+		return "java"
+	case ".kt", ".kts":
+		return "kotlin"
+	case ".scala":
+		return "scala"
+	case ".py":
+		return "python"
+	case ".js":
+		return "javascript"
+	case ".ts":
+		return "typescript"
+	default:
+		return ""
+	}
+}
+
+func backtickEach(items []string) []string {
+	out := make([]string, len(items))
+	for i, item := range items {
+		out[i] = "`" + item + "`"
+	}
+
+	return out
 }
 
 func collectModules(changedLinesWithCoverage domain.SourceLineCoverageReport) []string {
@@ -150,6 +249,8 @@ func collectModules(changedLinesWithCoverage domain.SourceLineCoverageReport) []
 	for k := range collector {
 		keys = append(keys, k)
 	}
+
+	sort.Strings(keys)
 
 	return keys
 }

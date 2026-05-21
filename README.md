@@ -16,6 +16,37 @@ This plugin will output the coverage details to the CI/CD step's console. A  sam
 This plugin  as well as has the ability to comment on the PR with a summary of the coverage details.
 ![ ](./images/github_pr_coverage.png)
 
+The PR comment is rendered as markdown and looks like this:
+
+> ## 📊 Pull Request Code Coverage
+>
+> Coverage below is for **only the lines changed in this PR**.
+>
+> **Modules:** `category-search`
+>
+> | Metric | Coverage | Count |
+> |:---|---:|---:|
+> | ✅ Covered instructions | **73%** | 8 |
+> | ❌ Missed instructions | 27% | 3 |
+> | 📈 Lines with coverage data | 22% | 2 |
+> | 📉 Lines without coverage data | 78% | 7 |
+>
+> <details><summary>ℹ️ What do these metrics mean?</summary>
+>
+> - **Covered instructions** — instructions (statements / bytecode) on the changed lines that were executed by your tests.
+> - **Missed instructions** — instructions on the changed lines that were **not** executed by any test.
+> - **Lines with coverage data** — changed lines the coverage tool tracks as executable code.
+> - **Lines without coverage data** — changed lines with no coverage information (comments, blank lines, declarations, etc.).
+> </details>
+>
+> <details><summary>❌ Lines missing coverage (1)</summary>
+>
+> **`category-search/src/main/java/com/tgt/CategorySearchApplication.java:52`**
+> ```java
+>     System.out.print("Something");
+> ```
+> </details>
+
 
 Currently, this plugin supports two coverage file format.
 * jacoco for jvm based languages like java,kotlin,scala
@@ -86,7 +117,7 @@ Once you have coverage.xml same can  be passed as an input to plugin shown below
 |coverage_type| true | | **supported values**: jacoco, cobertura<br><br>sets the coverage file format  |
 |coverage_file| true | | path to where the coverage file will be located, relative to the working dir |
 |source_dirs| true | | array of source dirs, relative to the working dir |
-|gh_api_base_url| false | | base url of the gh api for posting coverage comments<br><br>if not set, coverage details will not be commented on PR   |
+|gh_api_base_url| false | https://api.github.com | base url of the gh api for posting coverage comments<br><br>defaults to public GitHub; for GitHub Enterprise set this to your host (e.g. `https://git.target.com`)   |
 |gh_api_key| false | | api key to auth for posting coverage comments<br><br>if not set, coverage details will not be commented on PR  |
 |module | false  | \<empty string\> | sub-module to use if operating inside a multi-module project (e.g. gradle multi-project build) |
 

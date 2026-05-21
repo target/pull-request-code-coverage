@@ -13,6 +13,54 @@ import (
 	"github.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
 )
 
+func TestGithubPullRequest_commentsURL(t *testing.T) {
+
+	tests := []struct {
+		name       string
+		apiBaseURL string
+		expected   string
+	}{
+		{
+			name:       "github enterprise host gets /api/v3 appended",
+			apiBaseURL: "https://git.target.com",
+			expected:   "https://git.target.com/api/v3/repos/some_org/some_repo/issues/123/comments",
+		},
+		{
+			name:       "trailing slash is trimmed",
+			apiBaseURL: "https://git.target.com/",
+			expected:   "https://git.target.com/api/v3/repos/some_org/some_repo/issues/123/comments",
+		},
+		{
+			name:       "base url already pointing at /api/v3 is not doubled",
+			apiBaseURL: "https://git.target.com/api/v3",
+			expected:   "https://git.target.com/api/v3/repos/some_org/some_repo/issues/123/comments",
+		},
+		{
+			name:       "public github uses api.github.com without /api/v3",
+			apiBaseURL: "https://api.github.com",
+			expected:   "https://api.github.com/repos/some_org/some_repo/issues/123/comments",
+		},
+		{
+			name:       "enterprise cloud data residency api host without /api/v3",
+			apiBaseURL: "https://api.acme.ghe.com",
+			expected:   "https://api.acme.ghe.com/repos/some_org/some_repo/issues/123/comments",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			writer := &GithubPullRequest{
+				apiBaseURL: tt.apiBaseURL,
+				owner:      "some_org",
+				repo:       "some_repo",
+				pr:         "123",
+			}
+
+			assert.Equal(t, tt.expected, writer.commentsURL())
+		})
+	}
+}
+
 func TestGithubPullRequest_Write_FailedNewRequest(t *testing.T) {
 
 	mockClient := &pluginhttp.MockClient{}

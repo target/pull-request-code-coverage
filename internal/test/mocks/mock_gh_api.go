@@ -39,6 +39,7 @@ func WithMockGithubAPI(doer func(mockServerURL string, requestAsserter GithubAPI
 
 type GithubAPIRequestAsserter interface {
 	AssertRequestWasMade(t *testing.T, path string, apikey string, body map[string]interface{})
+	AssertRequestBodyContains(t *testing.T, path string, apikey string, substrings []string)
 	AssertNoRequestsWereMade(t *testing.T)
 }
 
@@ -73,6 +74,38 @@ func (a *DefaultGithubAPIRequestAsserter) AssertRequestWasMade(t *testing.T, pat
 	}
 
 	assert.Fail(t, fmt.Sprintf("Request was not made for path=%v, apikey=%v, body=%v", path, apikey, body))
+}
+
+// AssertRequestBodyContains finds the request matching path/apikey and asserts
+// its JSON "body" field contains every given substring. Use this (rather than an
+// exact body match) for the PR comment, whose markdown formatting is expected to
+// evolve — assert the meaningful content, not the exact bytes.
+func (a *DefaultGithubAPIRequestAsserter) AssertRequestBodyContains(t *testing.T, path string, apikey string, substrings []string) {
+	for _, r := range a.requests {
+		if r.req.URL.Path != path {
+			continue
+		}
+
+		if r.req.Header.Get("Authorization") != "token "+apikey {
+			continue
+		}
+
+		if r.req.Header.Get("Content-Type") != "application/json" {
+			continue
+		}
+
+		var bodyData map[string]interface{}
+		mustJSONUnmarshall(r.body, &bodyData)
+		body, _ := bodyData["body"].(string)
+
+		for _, sub := range substrings {
+			assert.Contains(t, body, sub)
+		}
+
+		return
+	}
+
+	assert.Fail(t, fmt.Sprintf("Request was not made for path=%v, apikey=%v", path, apikey))
 }
 
 func mustJSONUnmarshall(bytes []byte, result interface{}) {
