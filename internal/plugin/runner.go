@@ -33,6 +33,8 @@ func NewRunner() *DefaultRunner {
 // nolint: gocyclo
 func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSourceLinesSource io.Reader, reportDefaultOut io.Writer) error {
 
+	logrus.Info("starting pull-request-code-coverage run")
+
 	rawSourceDirs, found := propertyGetter("PARAMETER_SOURCE_DIRS")
 	if !found {
 		return errors.New("Missing property PARAMETER_SOURCE_DIRS")
