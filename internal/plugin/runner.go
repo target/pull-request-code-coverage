@@ -12,6 +12,7 @@ import (
 	"github.com/target/pull-request-code-coverage/internal/plugin/coverage"
 	"github.com/target/pull-request-code-coverage/internal/plugin/coverage/cobertura"
 	"github.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco"
+	"github.com/target/pull-request-code-coverage/internal/plugin/coverage/lcov"
 	"github.com/target/pull-request-code-coverage/internal/plugin/coverage/pythoncov"
 	"github.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
 	"github.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
@@ -153,6 +154,8 @@ func getCoverageReportLoader(coverageType string, sourceDirs []string) (coverage
 		return cobertura.NewReportLoader(sourceDirs[0]), nil
 	case "python":
 		return pythoncov.NewReportLoader(), nil
+	case "lcov", "javascript", "typescript":
+		return lcov.NewReportLoader(), nil
 	default:
 		return jacoco.NewReportLoader(), nil
 	}

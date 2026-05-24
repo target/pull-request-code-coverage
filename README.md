@@ -21,6 +21,7 @@ It supports **JVM, Go, and Python** projects, and works out of the box for [Vela
   - [JVM projects (jacoco)](#jvm-projects-jacoco)
   - [Go projects (cobertura)](#go-projects-cobertura)
   - [Python projects (python)](#python-projects-python)
+  - [JavaScript / TypeScript projects (lcov)](#javascript--typescript-projects-lcov)
   - [Running outside Vela](#running-outside-vela)
 - [Parameters](#parameters)
 - [Development](#development)
@@ -146,6 +147,7 @@ It carries the same sections as the console — diff-coverage headline, summary 
 | `jacoco` | Java, Kotlin, Scala (JVM) | JaCoCo XML |
 | `cobertura` | Go | Cobertura XML via [gocov-xml](https://github.com/AlekSi/gocov-xml) |
 | `python` | Python | coverage.py XML (`coverage xml` / pytest-cov `--cov-report=xml`) |
+| `lcov` | JavaScript, TypeScript | LCOV `lcov.info` from Jest / nyc / Vitest / c8 (aliases: `javascript`, `typescript`) |
 
 ---
 
@@ -261,6 +263,42 @@ Then pass `coverage.xml` with `coverage_type: python`:
 
 > Unlike `cobertura`, the `python` type matches files by their **repo-relative path**, so `source_dirs` does **not** need to be an absolute build path. Run from the repo root with `source_dirs: ["."]`, or set it to your source folder (e.g. `src`) if your code lives under one.
 
+### JavaScript / TypeScript projects (lcov)
+
+Most JS/TS coverage tools (Jest, nyc, Vitest, c8 — all built on Istanbul) emit an `lcov.info` file. Generate it with the `lcov` reporter:
+
+```
+ # Jest
+ - jest --coverage --coverageReporters=lcov
+ # nyc
+ - nyc --reporter=lcov npm test
+ # Vitest
+ - vitest run --coverage --coverage.reporter=lcov
+```
+
+Then pass the report (commonly `coverage/lcov.info`) with `coverage_type: lcov`:
+
+```yaml
+- name: check-pr-code-coverage
+   image: ghcr.io/target/pull-request-code-coverage:latest
+   pull: true
+   ruleset:
+     event: [pull_request]
+   parameters:
+     coverage_type: lcov            # aliases: javascript, typescript
+     # lcov.info generated in the step above
+     coverage_file: coverage/lcov.info
+     source_dirs:
+       # repo root; use e.g. "src" if your code lives under src/
+       - .
+     gh_api_base_url: https://git.target.com/api/v3
+   secrets:
+     - source: pull_request_api_key
+       target: plugin_gh_api_key
+```
+
+> Like `python`, the `lcov` type matches files by their **repo-relative path**, and it also handles the absolute `SF:` paths Istanbul commonly writes (e.g. `/home/runner/work/app/app/src/x.ts`) by suffix-matching. Set `source_dirs` to `.` (repo root) or to your source folder.
+
 ### Running outside Vela
 
 On other CIs (e.g. GitHub Actions), run the same image and pass the inputs as environment variables instead of Vela `parameters:`. Each parameter maps to a `PARAMETER_<NAME>` env var, and the build context maps to `BUILD_PULL_REQUEST_NUMBER`, `REPOSITORY_ORG`, and `REPOSITORY_NAME` (see the table below). Pipe the PR's unified diff to the container on stdin:
@@ -282,7 +320,7 @@ A working GitHub Actions example lives in [`.github/workflows/pr-coverage.yml`](
 
 | Parameter | Env var | Required | Default | Description |
 |---|---|---|---|---|
-| `coverage_type` | `PARAMETER_COVERAGE_TYPE` | yes | | coverage format: `jacoco`, `cobertura`, or `python` |
+| `coverage_type` | `PARAMETER_COVERAGE_TYPE` | yes | | coverage format: `jacoco`, `cobertura`, `python`, or `lcov` (aliases `javascript`/`typescript`) |
 | `coverage_file` | `PARAMETER_COVERAGE_FILE` | yes | | path to the coverage report, relative to the working dir |
 | `source_dirs` | `PARAMETER_SOURCE_DIRS` | yes | | array of source dirs, relative to the working dir (see per-language notes above) |
 | `module` | `PARAMETER_MODULE` | no | _(empty)_ | sub-module path prefix to strip, for multi-module projects (e.g. a Gradle multi-project build) |
