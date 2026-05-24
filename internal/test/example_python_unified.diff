@@ -1,0 +1,15 @@
+diff --git a/myapp/calculator.py b/myapp/calculator.py
+new file mode 100644
+index 0000000..abcdef0
+--- /dev/null
++++ b/myapp/calculator.py
+@@ -0,0 +1,9 @@
++def add(a, b):
++    return a + b
++
++def subtract(a, b):
++    result = a - b
++    return wrong_name
++
++def divide(a, b):
++    return a / b
