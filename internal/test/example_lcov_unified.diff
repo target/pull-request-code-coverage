@@ -1,0 +1,15 @@
+diff --git a/src/calculator.ts b/src/calculator.ts
+new file mode 100644
+index 0000000..abcdef0
+--- /dev/null
++++ b/src/calculator.ts
+@@ -0,0 +1,9 @@
++export function add(a: number, b: number): number {
++  return a + b;
++}
++export function subtract(a: number, b: number): number {
++  const result = a - b;
++  return wrongName;
++}
++export function divide(a: number, b: number): number {
++  return a / b;
