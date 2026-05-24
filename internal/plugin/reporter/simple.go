@@ -5,9 +5,12 @@ import (
 
 	"io"
 	"log"
+	"strings"
 
 	"github.com/target/pull-request-code-coverage/internal/plugin/domain"
 )
+
+const consoleRule = "──────────────────────────────────────────────────────────────"
 
 type Simple struct {
 	Out          io.Writer
@@ -24,33 +27,50 @@ func NewSimple(out io.Writer) *Simple {
 }
 
 func (s *Simple) Write(changedLinesWithCoverage domain.SourceLineCoverageReport) error {
-	s.printf("Missed Instructions:\n")
-	for _, r := range changedLinesWithCoverage {
-		if r.MissedInstructionCount > 0 {
-			s.printf("--- %v\n", lineDescription(r.SourceLine))
-			s.printf("%v\n", r.LineValue)
-		}
+	covered := changedLinesWithCoverage.TotalCoveredInstructions()
+	missed := changedLinesWithCoverage.TotalMissedInstructions()
+	linesWithData := changedLinesWithCoverage.TotalLinesWithData()
+	linesWithoutData := changedLinesWithCoverage.TotalLinesWithoutData()
+
+	totalInstructions := covered + missed
+	totalLines := linesWithData + linesWithoutData
+
+	coveredPct := toPercent(safeDiv(float32(covered), float32(totalInstructions), 1))
+	missedPct := toPercent(safeDiv(float32(missed), float32(totalInstructions), 0))
+	withDataPct := toPercent(safeDiv(float32(linesWithData), float32(totalLines), 1))
+	withoutDataPct := toPercent(safeDiv(float32(linesWithoutData), float32(totalLines), 0))
+
+	// Build the whole report first and emit it in one write so it stays a
+	// contiguous block in the CI console instead of interleaving with logs.
+	var b strings.Builder
+
+	b.WriteString(consoleRule + "\n")
+	b.WriteString(" 📊 Patch Coverage Report  —  changed lines only\n")
+	b.WriteString(consoleRule + "\n")
+
+	if modules := collectModules(changedLinesWithCoverage); len(modules) > 0 {
+		fmt.Fprintf(&b, " Modules: %s\n", strings.Join(modules, ", "))
 	}
 
-	summaryLines := generateSummaryLines(changedLinesWithCoverage, func(linesWithDataCount int, linesWithoutDataCount int, covered int, missed int) []string {
-		totalLines := linesWithDataCount + linesWithoutDataCount
-		totalInstructions := covered + missed
+	fmt.Fprintf(&b, "\n Diff coverage: %.f%% %s  —  %d of %d changed instructions covered\n\n",
+		coveredPct, coverageStatusEmoji(coveredPct), covered, totalInstructions)
 
-		result := make([]string, 5)
+	b.WriteString(" Summary\n")
+	fmt.Fprintf(&b, "   %-26s%3.f%%  (%d)\n", "Covered instructions", coveredPct, covered)
+	fmt.Fprintf(&b, "   %-26s%3.f%%  (%d)\n", "Missed instructions", missedPct, missed)
+	fmt.Fprintf(&b, "   %-26s%3.f%%  (%d)\n", "Tracked changed lines", withDataPct, linesWithData)
+	fmt.Fprintf(&b, "   %-26s%3.f%%  (%d)\n", "Untracked changed lines", withoutDataPct, linesWithoutData)
 
-		result[0] = "Code Coverage Summary:\n"
-		result[1] = fmt.Sprintf("Lines Without Coverage Data -> %.f%% (%d)\n", toPercent(safeDiv(float32(linesWithoutDataCount), float32(totalLines), 0)), linesWithoutDataCount)
-		result[2] = fmt.Sprintf("Lines With Coverage Data    -> %.f%% (%d)\n", toPercent(safeDiv(float32(linesWithDataCount), float32(totalLines), 1)), linesWithDataCount)
-		result[3] = fmt.Sprintf("Covered Instructions        -> %.f%% (%d)\n", toPercent(safeDiv(float32(covered), float32(totalInstructions), 1)), covered)
-		result[4] = fmt.Sprintf("Missed Instructions         -> %.f%% (%d)\n", toPercent(safeDiv(float32(missed), float32(totalInstructions), 0)), missed)
+	b.WriteString("\n Note: \"lines\" are the source lines you changed; \"instructions\" are the\n")
+	b.WriteString(" executable units the coverage tool counts inside them (one line can hold\n")
+	b.WriteString(" several, e.g. JaCoCo bytecode), so the two counts differ.\n\n")
 
-		return result
-	})
+	b.WriteString(fileCoverageConsoleSection(changedLinesWithCoverage))
+	b.WriteString(uncoveredLinesConsoleSection(changedLinesWithCoverage))
 
-	s.print("\n")
-	for _, line := range summaryLines {
-		s.print(line)
-	}
+	b.WriteString(consoleRule + "\n")
+
+	s.print(b.String())
 
 	return nil
 }
@@ -59,14 +79,67 @@ func (s *Simple) GetName() string {
 	return "simple stdout reporter"
 }
 
-func generateSummaryLines(changedLinesWithCoverage domain.SourceLineCoverageReport, formatter func(linesWithDataCount int, linesWithoutDataCount int, covered int, missed int) []string) []string {
-	linesWithDataCount := changedLinesWithCoverage.TotalLinesWithData()
-	linesWithoutDataCount := changedLinesWithCoverage.TotalLinesWithoutData()
+// fileCoverageConsoleSection renders the per-file breakdown for the console,
+// lowest-covered first, omitting files with no measurable lines.
+func fileCoverageConsoleSection(changedLinesWithCoverage domain.SourceLineCoverageReport) string {
+	files := collectFileCoverage(changedLinesWithCoverage)
 
-	covered := changedLinesWithCoverage.TotalCoveredInstructions()
-	missed := changedLinesWithCoverage.TotalMissedInstructions()
+	var b strings.Builder
+	b.WriteString(" Coverage by file  (lowest coverage first)\n")
 
-	return formatter(linesWithDataCount, linesWithoutDataCount, covered, missed)
+	measured := 0
+	unmeasured := 0
+
+	for _, f := range files {
+		instructions := f.covered + f.missed
+
+		if instructions == 0 {
+			unmeasured++
+			continue
+		}
+
+		measured++
+		pct := toPercent(safeDiv(float32(f.covered), float32(instructions), 1))
+		fmt.Fprintf(&b, "   %3.f%%   %3d cov / %3d miss   %s\n", pct, f.covered, f.missed, f.path)
+	}
+
+	if measured == 0 {
+		b.WriteString("   (no files with measurable lines)\n")
+	}
+
+	if unmeasured > 0 {
+		fmt.Fprintf(&b, "   (%d file(s) with no measurable lines omitted)\n", unmeasured)
+	}
+
+	b.WriteString("\n")
+
+	return b.String()
+}
+
+// uncoveredLinesConsoleSection lists each changed line that tests never ran.
+func uncoveredLinesConsoleSection(changedLinesWithCoverage domain.SourceLineCoverageReport) string {
+	var rows []string
+
+	for _, r := range changedLinesWithCoverage {
+		if r.MissedInstructionCount > 0 {
+			rows = append(rows, fmt.Sprintf("   - %s\n         %s\n", lineDescription(r.SourceLine), r.LineValue))
+		}
+	}
+
+	var b strings.Builder
+	fmt.Fprintf(&b, " Uncovered lines (%d)\n", len(rows))
+
+	if len(rows) == 0 {
+		b.WriteString("   none 🎉\n")
+	}
+
+	for _, row := range rows {
+		b.WriteString(row)
+	}
+
+	b.WriteString("\n")
+
+	return b.String()
 }
 
 func toPercent(decimal float32) float32 {

@@ -107,7 +107,7 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 
 	b.WriteString("## 🛡️ Patch Coverage Report\n\n")
 	b.WriteString("> Scope: **changed lines only** — the code this PR adds or edits, not whole files or the repo. ")
-	b.WriteString("There's no base-branch diff here; it answers one thing — *did your tests run the code you just touched?*\n\n")
+	b.WriteString("It answers one thing — *did your tests run the code you just touched?*\n\n")
 
 	if len(modules) > 0 {
 		fmt.Fprintf(&b, "*Modules:* %v\n\n", strings.Join(modules, ", "))
@@ -123,6 +123,7 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 	fmt.Fprintf(&b, "| 📈 Tracked changed lines | `%d` (%.f%%) | lines the coverage tool could measure |\n", linesWithData, withDataPct)
 	fmt.Fprintf(&b, "| ⚪ Untracked changed lines | `%d` (%.f%%) | comments, blanks, declarations |\n", linesWithoutData, withoutDataPct)
 	b.WriteString("\n")
+	b.WriteString("<sub>**Lines** = the source lines you changed. **Instructions** = the executable units the coverage tool counts inside those lines — one line can hold several (e.g. JaCoCo bytecode), so the two counts differ.</sub>\n\n")
 
 	b.WriteString(fileCoverageSection(changedLinesWithCoverage))
 	b.WriteString(missedInstructionsSection(changedLinesWithCoverage))
@@ -260,7 +261,7 @@ func missedInstructionsSection(changedLinesWithCoverage domain.SourceLineCoverag
 		return ""
 	}
 
-	return fmt.Sprintf("\n<details><summary>🔍 Missed instructions (%d)</summary>\n\n", missedLineCount) +
+	return fmt.Sprintf("\n<details><summary>🔍 Uncovered lines (%d)</summary>\n\n", missedLineCount) +
 		"```\n" + missedInstructions + "```" + "\n</details>\n"
 }
 
