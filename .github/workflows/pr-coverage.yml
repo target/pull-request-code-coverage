@@ -14,9 +14,10 @@ permissions:
 jobs:
   coverage:
     runs-on: ubuntu-latest
-    # Fork PRs only get a read-only GITHUB_TOKEN (can't comment) and no secrets,
-    # so restrict to same-repo PRs to avoid a guaranteed failure on forks.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # Runs on fork PRs too. Fork PRs only get a read-only GITHUB_TOKEN and no
+    # secrets, so the plugin can't post the PR comment there — it just prints
+    # coverage to the job log (the reporter no-ops the comment when the token /
+    # PR context is missing).
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -45,6 +46,11 @@ jobs:
         run: docker build -t pr-code-coverage:ci .
 
       - name: Report coverage on changed lines
+        # On fork PRs the GITHUB_TOKEN is read-only: the plugin can read the diff
+        # but the PR-comment POST gets a 403 and errors. Tolerate that on forks so
+        # the run still goes green with coverage printed to the log; same-repo PRs
+        # keep failing loudly on real errors.
+        continue-on-error: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
         env:
           # Fetch the PR diff straight from the GitHub API instead of piping in a
           # local `git diff`. Note the API diff covers ALL changed files, not just
@@ -73,5 +79,4 @@ jobs:
             -e REPOSITORY_NAME \
             -v "${{ github.workspace }}:${{ github.workspace }}" \
             -w "${{ github.workspace }}" \
-            --entrypoint /plugin \
             pr-code-coverage:ci
