@@ -46,11 +46,12 @@ The CI (`.github/workflows/test.yml`) runs build, test, `make format`, and `make
 
 Entry point `main.go` → `plugin.NewRunner().Run(os.LookupEnv, os.Stdin, os.Stdout)`.
 The runner (`internal/plugin/runner.go`) reads **config from env vars** (`PARAMETER_*`,
-`BUILD_PULL_REQUEST_NUMBER`, `REPOSITORY_ORG`, `REPOSITORY_NAME`), the **diff from stdin**, and the
+`BUILD_PULL_REQUEST_NUMBER`, `REPOSITORY_ORG`, `REPOSITORY_NAME`), the **diff** (from stdin by
+default, or fetched from the GitHub API — see `PARAMETER_DIFF_SOURCE` below), and the
 **coverage report from the file** at `PARAMETER_COVERAGE_FILE`.
 
 ```
-stdin (unified diff) ──► sourcelines/unifieddiff ──► []domain.SourceLine
+diff (unified) ──► sourcelines/unifieddiff ──► []domain.SourceLine
                                                           │  {Module,SrcDir,Pkg,FileName,LineNumber,LineValue}
 coverage file ──► coverage.Loader.Load() ──► coverage.Report
                                                           │
@@ -65,6 +66,12 @@ coverage file ──► coverage.Loader.Load() ──► coverage.Report
 Key packages:
 - `internal/plugin/sourcelines/unifieddiff/changed_source_loader.go` — parses the unified diff into
   changed `SourceLine`s. `PARAMETER_SOURCE_DIRS` controls how a path prefix is split into `SrcDir`/`Pkg`.
+  Handles both `--unified=0` diffs (the stdin/Vela path, no context lines) and diffs that carry context
+  lines (e.g. from the GitHub API) — context lines advance the new-file line counter but aren't recorded.
+- `internal/plugin/githubdiff/diff.go` — alternative diff source. When `PARAMETER_DIFF_SOURCE=github`,
+  the runner fetches the PR diff from `GET /repos/{owner}/{repo}/pulls/{n}` with the
+  `application/vnd.github.v3.diff` media type instead of reading stdin. Default is `stdin`
+  (unchanged behavior). The `github` mode requires `PARAMETER_GH_API_KEY` + the three build-context vars.
 - `internal/plugin/coverage/` — `report.go` defines the two interfaces every format implements:
   `Loader.Load(file) (Report, error)` and `Report.GetCoverageData(module, sourceDir, pkg, fileName, lineNumber) (*CoverageData, bool)`.
 - `internal/plugin/calculator/calculator.go` — joins changed lines to coverage data.

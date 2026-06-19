@@ -20,8 +20,10 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # need the base branch present to diff against it
+        # No fetch-depth needed: the plugin now fetches the PR diff from the
+        # GitHub API (PARAMETER_DIFF_SOURCE=github), so we don't diff against the
+        # base branch locally. Checkout is only here to build the image and run
+        # the tests that produce the coverage report.
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -44,6 +46,10 @@ jobs:
 
       - name: Report coverage on changed lines
         env:
+          # Fetch the PR diff straight from the GitHub API instead of piping in a
+          # local `git diff`. Note the API diff covers ALL changed files, not just
+          # *.go, so non-Go edits (yml/md) show up as "untracked changed lines".
+          PARAMETER_DIFF_SOURCE: github
           PARAMETER_COVERAGE_TYPE: cobertura
           PARAMETER_COVERAGE_FILE: coverage.xml
           # Must equal the cobertura <source> path (the dir go test ran in).
@@ -53,18 +59,19 @@ jobs:
           BUILD_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
           REPOSITORY_ORG: ${{ github.repository_owner }}
           REPOSITORY_NAME: ${{ github.event.repository.name }}
+        # The container still mounts the workspace so it can read coverage.xml;
+        # the diff no longer comes from stdin, so `-i` and the pipe are gone.
         run: |
-          git fetch --no-tags origin "${{ github.base_ref }}"
-          git --no-pager diff --unified=0 "origin/${{ github.base_ref }}" -- '*.go' \
-            | docker run --rm -i \
-                -e PARAMETER_COVERAGE_TYPE \
-                -e PARAMETER_COVERAGE_FILE \
-                -e PARAMETER_SOURCE_DIRS \
-                -e PARAMETER_GH_API_KEY \
-                -e BUILD_PULL_REQUEST_NUMBER \
-                -e REPOSITORY_ORG \
-                -e REPOSITORY_NAME \
-                -v "${{ github.workspace }}:${{ github.workspace }}" \
-                -w "${{ github.workspace }}" \
-                --entrypoint /plugin \
-                pr-code-coverage:ci
+          docker run --rm \
+            -e PARAMETER_DIFF_SOURCE \
+            -e PARAMETER_COVERAGE_TYPE \
+            -e PARAMETER_COVERAGE_FILE \
+            -e PARAMETER_SOURCE_DIRS \
+            -e PARAMETER_GH_API_KEY \
+            -e BUILD_PULL_REQUEST_NUMBER \
+            -e REPOSITORY_ORG \
+            -e REPOSITORY_NAME \
+            -v "${{ github.workspace }}:${{ github.workspace }}" \
+            -w "${{ github.workspace }}" \
+            --entrypoint /plugin \
+            pr-code-coverage:ci

@@ -14,6 +14,7 @@ import (
 	"github.com/target/pull-request-code-coverage/internal/plugin/coverage/jacoco"
 	"github.com/target/pull-request-code-coverage/internal/plugin/coverage/lcov"
 	"github.com/target/pull-request-code-coverage/internal/plugin/coverage/pythoncov"
+	"github.com/target/pull-request-code-coverage/internal/plugin/githubdiff"
 	"github.com/target/pull-request-code-coverage/internal/plugin/pluginhttp"
 	"github.com/target/pull-request-code-coverage/internal/plugin/pluginjson"
 	"github.com/target/pull-request-code-coverage/internal/plugin/reporter"
@@ -95,6 +96,33 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 	coverageReport, loadCoverageErr := loader.Load(coverageFile)
 	if loadCoverageErr != nil {
 		return errors.Wrap(loadCoverageErr, "Failed loading coverage report")
+	}
+
+	diffSource, found := propertyGetter("PARAMETER_DIFF_SOURCE")
+	if !found || diffSource == "" {
+		logrus.Info("PARAMETER_DIFF_SOURCE was missing, defaulting to stdin")
+		diffSource = "stdin"
+	}
+
+	switch diffSource {
+	case "stdin":
+		// changedSourceLinesSource already points at the piped-in diff (stdin);
+		// nothing to do. This is the original, default behavior.
+	case "github":
+		if !ghAPIKeyFound || !repoPRFound || !repoOwnerFound || !repoNameFound {
+			return errors.New("PARAMETER_DIFF_SOURCE=github requires a GitHub API key (PARAMETER_GH_API_KEY), BUILD_PULL_REQUEST_NUMBER, REPOSITORY_ORG and REPOSITORY_NAME")
+		}
+
+		logrus.Info("PARAMETER_DIFF_SOURCE is github, fetching diff from the GitHub API")
+
+		diffReader, fetchErr := githubdiff.NewLoader(ghAPIKey, ghAPIBaseURL, repoPR, repoOwner, repoName, &pluginhttp.DefaultClient{}).Load()
+		if fetchErr != nil {
+			return errors.Wrap(fetchErr, "Failed fetching diff from github")
+		}
+
+		changedSourceLinesSource = diffReader
+	default:
+		return errors.Errorf("Unknown PARAMETER_DIFF_SOURCE %q (expected \"stdin\" or \"github\")", diffSource)
 	}
 
 	changedLines, changedLinesErr := unifieddiff.NewChangedSourceLinesLoader(module, sourceDirs).Load(changedSourceLinesSource)

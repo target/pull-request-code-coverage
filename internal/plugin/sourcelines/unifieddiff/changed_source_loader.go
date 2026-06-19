@@ -39,6 +39,7 @@ func (l *Loader) Load(inReader io.Reader) ([]domain.SourceLine, error) {
 var changedFileLine = regexp.MustCompile("^[+][+][+][ ]b?[/](.*)")
 var changedLineCounts = regexp.MustCompile("^[@][@][ ][-].*?[ ][+](.*?)[ ][@][@].*")
 var addedLine = regexp.MustCompile("^[+].*")
+var contextLine = regexp.MustCompile("^[ ].*")
 var emptyStr = ""
 
 // nolint: gocyclo
@@ -139,6 +140,17 @@ func getChangedLinesFromUnifiedDiff(unifiedDiffLines []string, module string, so
 				Module:     *currentModule,
 			})
 
+			currentRelativeLine++
+			linesLeftInBlock--
+		} else if linesLeftInBlock > 0 && contextLine.MatchString(line) {
+
+			// A context line is unchanged code the diff shows for orientation. We
+			// don't record it (the PR didn't change it), but it still occupies a
+			// line in the new file and counts against the hunk's line budget, so
+			// advance both counters to keep subsequent changed-line numbers
+			// correct. Diffs produced with --unified=0 (the Vela/stdin path) have
+			// no context lines, so this branch is inert there; it only matters for
+			// diffs that carry context, such as those fetched from the GitHub API.
 			currentRelativeLine++
 			linesLeftInBlock--
 		}
