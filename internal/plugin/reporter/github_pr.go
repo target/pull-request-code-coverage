@@ -24,8 +24,14 @@ type GithubPullRequest struct {
 }
 
 const (
+	HTTPResponseOK      = 200
 	HTTPResponseCreated = 201
 )
+
+// commentMarker is an HTML comment embedded at the top of the report. It renders
+// invisibly on GitHub but lets a later run find the comment it posted earlier so
+// it can update that one in place instead of posting a new comment every push.
+const commentMarker = "<!-- pull-request-code-coverage:patch-coverage -->"
 
 func NewGithubPullRequest(apiKey string, apiBaseURL string, pr string, owner string, repo string, httpClient pluginhttp.Client, jsonClient pluginjson.Client) *GithubPullRequest {
 	return &GithubPullRequest{
@@ -51,12 +57,32 @@ func (s *GithubPullRequest) Write(changedLinesWithCoverage domain.SourceLineCove
 		return errors.Wrap(bodyErr, "Failed creating payload for github")
 	}
 
-	url := fmt.Sprintf("%v/repos/%v/%v/issues/%v/comments", strings.TrimRight(s.apiBaseURL, "/"), s.owner, s.repo, s.pr)
+	existingID, findErr := s.findExistingCommentID()
+	if findErr != nil {
+		return findErr
+	}
 
-	req, newErr := s.httpClient.NewRequest(
-		"POST",
-		url,
-		body)
+	// Update the comment from a previous run when we find one; otherwise post a
+	// fresh comment. This keeps a single, always-current coverage comment on the
+	// PR instead of a new one per push.
+	if existingID != 0 {
+		url := fmt.Sprintf("%v/repos/%v/%v/issues/comments/%v", s.baseURL(), s.owner, s.repo, existingID)
+		return s.send("PATCH", url, body, HTTPResponseOK)
+	}
+
+	url := fmt.Sprintf("%v/repos/%v/%v/issues/%v/comments", s.baseURL(), s.owner, s.repo, s.pr)
+	return s.send("POST", url, body, HTTPResponseCreated)
+}
+
+// baseURL returns the configured GitHub API root without a trailing slash.
+func (s *GithubPullRequest) baseURL() string {
+	return strings.TrimRight(s.apiBaseURL, "/")
+}
+
+// send issues a write request (POST/PATCH) carrying the comment payload and
+// verifies the response status.
+func (s *GithubPullRequest) send(method string, url string, body io.Reader, wantStatus int) error {
+	req, newErr := s.httpClient.NewRequest(method, url, body)
 
 	if newErr != nil {
 		return errors.Wrap(newErr, "Failed creating request to github")
@@ -75,11 +101,62 @@ func (s *GithubPullRequest) Write(changedLinesWithCoverage domain.SourceLineCove
 		_ = resp.Body.Close()
 	}()
 
-	if resp.StatusCode != HTTPResponseCreated {
+	if resp.StatusCode != wantStatus {
 		return errors.Errorf("Failed calling github: bad status code: %v", resp.StatusCode)
 	}
 
 	return nil
+}
+
+// findExistingCommentID looks for a coverage comment this plugin posted on an
+// earlier run, identified by the hidden commentMarker. It returns 0 when none is
+// found. Only the first page of comments is checked (per_page=100), which covers
+// any realistic PR. The GET only needs read access, so it also works on fork PRs
+// even though the follow-up write may not.
+func (s *GithubPullRequest) findExistingCommentID() (int64, error) {
+	url := fmt.Sprintf("%v/repos/%v/%v/issues/%v/comments?per_page=100", s.baseURL(), s.owner, s.repo, s.pr)
+
+	req, newErr := s.httpClient.NewRequest("GET", url, nil)
+	if newErr != nil {
+		return 0, errors.Wrap(newErr, "Failed creating request to github")
+	}
+
+	req.Header.Add("Authorization", "token "+s.apiKey)
+
+	resp, doErr := s.httpClient.Do(req)
+	if doErr != nil {
+		return 0, errors.Wrap(doErr, "Failed calling github")
+	}
+
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	if resp.StatusCode != HTTPResponseOK {
+		return 0, errors.Errorf("Failed listing github comments: bad status code: %v", resp.StatusCode)
+	}
+
+	respBody, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		return 0, errors.Wrap(readErr, "Failed reading github comments response")
+	}
+
+	var comments []struct {
+		ID   int64  `json:"id"`
+		Body string `json:"body"`
+	}
+
+	if unmarshalErr := s.jsonClient.Unmarshal(respBody, &comments); unmarshalErr != nil {
+		return 0, errors.Wrap(unmarshalErr, "Failed parsing github comments response")
+	}
+
+	for _, c := range comments {
+		if strings.Contains(c.Body, commentMarker) {
+			return c.ID, nil
+		}
+	}
+
+	return 0, nil
 }
 
 func (s *GithubPullRequest) GetName() string {
@@ -87,6 +164,25 @@ func (s *GithubPullRequest) GetName() string {
 }
 
 func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.SourceLineCoverageReport) (io.Reader, error) {
+
+	data := map[string]string{
+		"body": buildMarkdownReport(changedLinesWithCoverage),
+	}
+
+	dataBytes, marshalErr := s.jsonClient.Marshal(data)
+
+	if marshalErr != nil {
+		return nil, errors.Wrap(marshalErr, "Failed marshalling payload to json")
+	}
+
+	return bytes.NewBuffer(dataBytes), nil
+}
+
+// buildMarkdownReport renders the changed-line coverage report as GitHub-flavored
+// Markdown. It is shared by the PR-comment reporter and the job-summary reporter
+// so both show identical output. The leading commentMarker is invisible when
+// rendered and lets the PR reporter find and update its own comment.
+func buildMarkdownReport(changedLinesWithCoverage domain.SourceLineCoverageReport) string {
 
 	modules := collectModules(changedLinesWithCoverage)
 
@@ -105,6 +201,7 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 
 	var b strings.Builder
 
+	b.WriteString(commentMarker + "\n")
 	b.WriteString("## 🛡️ Patch Coverage Report\n\n")
 	b.WriteString("> Scope: **changed lines only** — the code this PR adds or edits, not whole files or the repo. ")
 	b.WriteString("It answers one thing — *did your tests run the code you just touched?*\n\n")
@@ -129,17 +226,7 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 	b.WriteString(missedInstructionsSection(changedLinesWithCoverage))
 	b.WriteString("\n<sub>🤖 Generated by <a href=\"https://github.com/target/pull-request-code-coverage\">pull-request-code-coverage</a> — coverage for changed lines only.</sub>\n")
 
-	data := map[string]string{
-		"body": b.String(),
-	}
-
-	dataBytes, marshalErr := s.jsonClient.Marshal(data)
-
-	if marshalErr != nil {
-		return nil, errors.Wrap(marshalErr, "Failed marshalling payload to json")
-	}
-
-	return bytes.NewBuffer(dataBytes), nil
+	return b.String()
 }
 
 // fileCoverage holds the aggregated changed-line coverage for a single file.
