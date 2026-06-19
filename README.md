@@ -346,8 +346,11 @@ docker run --rm \
 | `BUILD_PULL_REQUEST_NUMBER` | the PR number to comment on |
 | `REPOSITORY_ORG` | repository owner / org |
 | `REPOSITORY_NAME` | repository name |
+| `GITHUB_STEP_SUMMARY` | set automatically by GitHub Actions. When present, the plugin also writes the report to the [job summary](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary), so coverage shows on the run page even on fork PRs that can't be commented on |
 
 > The PR comment is posted only when `gh_api_key` **and** all three build-context values are present. Otherwise the plugin prints to the console and exits successfully.
+>
+> The comment is **sticky**: on later pushes the plugin updates its existing comment in place instead of posting a new one each time. In GitHub Actions, mount the summary file (`-v "$GITHUB_STEP_SUMMARY:$GITHUB_STEP_SUMMARY" -e GITHUB_STEP_SUMMARY`) to get the job-summary output — see [`.github/workflows/pr-coverage.yml`](.github/workflows/pr-coverage.yml).
 
 ---
 

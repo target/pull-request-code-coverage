@@ -19,3 +19,9 @@ func (m *MockClient) Marshal(data interface{}) ([]byte, error) {
 	}
 	return r.([]byte), e
 }
+
+func (m *MockClient) Unmarshal(data []byte, v interface{}) error {
+	args := m.Called(data, v)
+
+	return args.Error(0)
+}

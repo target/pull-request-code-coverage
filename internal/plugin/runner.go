@@ -3,6 +3,7 @@ package plugin
 import (
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 
@@ -153,6 +154,23 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 	if ghAPIKeyFound && repoPRFound && repoOwnerFound && repoNameFound {
 		reporters = append(reporters, reporter.NewGithubPullRequest(ghAPIKey, ghAPIBaseURL, repoPR, repoOwner, repoName, &pluginhttp.DefaultClient{}, &pluginjson.DefaultClient{}))
 	}
+
+	// GitHub Actions sets GITHUB_STEP_SUMMARY to a file whose Markdown is rendered
+	// on the run's summary page. Writing there surfaces coverage even when no PR
+	// comment can be posted (e.g. fork PRs with a read-only token).
+	if summaryPath, found := propertyGetter("GITHUB_STEP_SUMMARY"); found && summaryPath != "" {
+		// nolint: gosec // path comes from the trusted GitHub Actions runner env
+		summaryFile, openErr := os.OpenFile(summaryPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if openErr != nil {
+			return errors.Wrap(openErr, "Failed opening GITHUB_STEP_SUMMARY file")
+		}
+		defer func() {
+			_ = summaryFile.Close()
+		}()
+
+		reporters = append(reporters, reporter.NewStepSummary(summaryFile))
+	}
+
 	logrus.Info("enabled reporters are ")
 	for _, eachOne := range reporters {
 		logrus.Info(eachOne.GetName())

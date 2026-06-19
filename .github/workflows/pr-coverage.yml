@@ -65,8 +65,10 @@ jobs:
           BUILD_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
           REPOSITORY_ORG: ${{ github.repository_owner }}
           REPOSITORY_NAME: ${{ github.event.repository.name }}
-        # The container still mounts the workspace so it can read coverage.xml;
-        # the diff no longer comes from stdin, so `-i` and the pipe are gone.
+        # The container mounts the workspace so it can read coverage.xml, and the
+        # GITHUB_STEP_SUMMARY file so the plugin can render coverage on the run's
+        # summary page (visible even on fork PRs where the comment can't post).
+        # The diff no longer comes from stdin, so `-i` and the pipe are gone.
         run: |
           docker run --rm \
             -e PARAMETER_DIFF_SOURCE \
@@ -77,6 +79,8 @@ jobs:
             -e BUILD_PULL_REQUEST_NUMBER \
             -e REPOSITORY_ORG \
             -e REPOSITORY_NAME \
+            -e GITHUB_STEP_SUMMARY \
             -v "${{ github.workspace }}:${{ github.workspace }}" \
+            -v "$GITHUB_STEP_SUMMARY:$GITHUB_STEP_SUMMARY" \
             -w "${{ github.workspace }}" \
             pr-code-coverage:ci

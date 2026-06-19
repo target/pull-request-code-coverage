@@ -81,6 +81,14 @@ func TestDefaultRunner_Run_DiffSourceGithub_FetchesDiff(t *testing.T) {
 			return
 		}
 
+		// The sticky-comment reporter lists existing comments first; no prior
+		// comment exists, so it then POSTs a new one.
+		if r.Method == http.MethodGet && r.URL.Path == "/repos/some_org/some_repo/issues/123/comments" {
+			w.WriteHeader(200)
+			_, _ = w.Write([]byte("[]"))
+			return
+		}
+
 		// The PR-comment POST from the github reporter.
 		w.WriteHeader(201)
 	}))
