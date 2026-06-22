@@ -14,14 +14,17 @@ permissions:
 jobs:
   coverage:
     runs-on: ubuntu-latest
-    # Fork PRs only get a read-only GITHUB_TOKEN (can't comment) and no secrets,
-    # so restrict to same-repo PRs to avoid a guaranteed failure on forks.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # Runs on fork PRs too. Fork PRs only get a read-only GITHUB_TOKEN and no
+    # secrets, so the plugin can't post the PR comment there — it just prints
+    # coverage to the job log (the reporter no-ops the comment when the token /
+    # PR context is missing).
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # need the base branch present to diff against it
+        # No fetch-depth needed: the plugin now fetches the PR diff from the
+        # GitHub API (PARAMETER_DIFF_SOURCE=github), so we don't diff against the
+        # base branch locally. Checkout is only here to build the image and run
+        # the tests that produce the coverage report.
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -43,7 +46,16 @@ jobs:
         run: docker build -t pr-code-coverage:ci .
 
       - name: Report coverage on changed lines
+        # On fork PRs the GITHUB_TOKEN is read-only: the plugin can read the diff
+        # but the PR-comment POST gets a 403 and errors. Tolerate that on forks so
+        # the run still goes green with coverage printed to the log; same-repo PRs
+        # keep failing loudly on real errors.
+        continue-on-error: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
         env:
+          # Fetch the PR diff straight from the GitHub API instead of piping in a
+          # local `git diff`. Note the API diff covers ALL changed files, not just
+          # *.go, so non-Go edits (yml/md) show up as "untracked changed lines".
+          PARAMETER_DIFF_SOURCE: github
           PARAMETER_COVERAGE_TYPE: cobertura
           PARAMETER_COVERAGE_FILE: coverage.xml
           # Must equal the cobertura <source> path (the dir go test ran in).
@@ -53,18 +65,22 @@ jobs:
           BUILD_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
           REPOSITORY_ORG: ${{ github.repository_owner }}
           REPOSITORY_NAME: ${{ github.event.repository.name }}
+        # The container mounts the workspace so it can read coverage.xml, and the
+        # GITHUB_STEP_SUMMARY file so the plugin can render coverage on the run's
+        # summary page (visible even on fork PRs where the comment can't post).
+        # The diff no longer comes from stdin, so `-i` and the pipe are gone.
         run: |
-          git fetch --no-tags origin "${{ github.base_ref }}"
-          git --no-pager diff --unified=0 "origin/${{ github.base_ref }}" -- '*.go' \
-            | docker run --rm -i \
-                -e PARAMETER_COVERAGE_TYPE \
-                -e PARAMETER_COVERAGE_FILE \
-                -e PARAMETER_SOURCE_DIRS \
-                -e PARAMETER_GH_API_KEY \
-                -e BUILD_PULL_REQUEST_NUMBER \
-                -e REPOSITORY_ORG \
-                -e REPOSITORY_NAME \
-                -v "${{ github.workspace }}:${{ github.workspace }}" \
-                -w "${{ github.workspace }}" \
-                --entrypoint /plugin \
-                pr-code-coverage:ci
+          docker run --rm \
+            -e PARAMETER_DIFF_SOURCE \
+            -e PARAMETER_COVERAGE_TYPE \
+            -e PARAMETER_COVERAGE_FILE \
+            -e PARAMETER_SOURCE_DIRS \
+            -e PARAMETER_GH_API_KEY \
+            -e BUILD_PULL_REQUEST_NUMBER \
+            -e REPOSITORY_ORG \
+            -e REPOSITORY_NAME \
+            -e GITHUB_STEP_SUMMARY \
+            -v "${{ github.workspace }}:${{ github.workspace }}" \
+            -v "$GITHUB_STEP_SUMMARY:$GITHUB_STEP_SUMMARY" \
+            -w "${{ github.workspace }}" \
+            pr-code-coverage:ci

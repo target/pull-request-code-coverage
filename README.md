@@ -312,6 +312,16 @@ git --no-pager diff --unified=0 "origin/$BASE_REF" -- '*.go' | docker run --rm -
 
 A working GitHub Actions example lives in [`.github/workflows/pr-coverage.yml`](.github/workflows/pr-coverage.yml).
 
+**No git checkout?** Set `PARAMETER_DIFF_SOURCE=github` and the plugin fetches the PR's diff straight from the GitHub API instead of reading stdin — so you don't need the repo checked out or `git` available, just the coverage file and a token. This uses the same diff GitHub shows reviewers (computed against the merge base), so it can differ slightly from a local `git diff origin/<base>`. It requires `PARAMETER_GH_API_KEY`, `BUILD_PULL_REQUEST_NUMBER`, `REPOSITORY_ORG`, and `REPOSITORY_NAME`.
+
+```
+docker run --rm \
+  -e PARAMETER_DIFF_SOURCE=github \
+  -e PARAMETER_COVERAGE_TYPE -e PARAMETER_COVERAGE_FILE -e PARAMETER_SOURCE_DIRS \
+  -e PARAMETER_GH_API_KEY -e BUILD_PULL_REQUEST_NUMBER -e REPOSITORY_ORG -e REPOSITORY_NAME \
+  ghcr.io/target/pull-request-code-coverage:latest
+```
+
 ---
 
 ## Parameters
@@ -326,6 +336,7 @@ A working GitHub Actions example lives in [`.github/workflows/pr-coverage.yml`](
 | `module` | `PARAMETER_MODULE` | no | _(empty)_ | sub-module path prefix to strip, for multi-module projects (e.g. a Gradle multi-project build) |
 | `gh_api_key` | `PARAMETER_GH_API_KEY` (or `PLUGIN_GH_API_KEY`) | no | | token used to post the PR comment. If unset, no comment is posted (console only) |
 | `gh_api_base_url` | `PARAMETER_GH_API_BASE_URL` | no | `https://api.github.com` | GitHub API root. For GitHub Enterprise, use the full root including `/api/v3` |
+| `diff_source` | `PARAMETER_DIFF_SOURCE` | no | `stdin` | where the PR diff comes from: `stdin` (pipe a `git diff` in, the default) or `github` (fetch the PR diff from the GitHub API — needs no git checkout; requires `gh_api_key` and the three build-context values) |
 | `debug` | `PARAMETER_DEBUG` | no | `false` | enable debug logging |
 
 **Build context** — provided automatically by Vela; set these yourself on other CIs to enable the PR comment.
@@ -335,8 +346,11 @@ A working GitHub Actions example lives in [`.github/workflows/pr-coverage.yml`](
 | `BUILD_PULL_REQUEST_NUMBER` | the PR number to comment on |
 | `REPOSITORY_ORG` | repository owner / org |
 | `REPOSITORY_NAME` | repository name |
+| `GITHUB_STEP_SUMMARY` | set automatically by GitHub Actions. When present, the plugin also writes the report to the [job summary](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary), so coverage shows on the run page even on fork PRs that can't be commented on |
 
 > The PR comment is posted only when `gh_api_key` **and** all three build-context values are present. Otherwise the plugin prints to the console and exits successfully.
+>
+> The comment is **sticky**: on later pushes the plugin updates its existing comment in place instead of posting a new one each time. In GitHub Actions, mount the summary file (`-v "$GITHUB_STEP_SUMMARY:$GITHUB_STEP_SUMMARY" -e GITHUB_STEP_SUMMARY`) to get the job-summary output — see [`.github/workflows/pr-coverage.yml`](.github/workflows/pr-coverage.yml).
 
 ---
 

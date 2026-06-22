@@ -46,32 +46,43 @@ The CI (`.github/workflows/test.yml`) runs build, test, `make format`, and `make
 
 Entry point `main.go` → `plugin.NewRunner().Run(os.LookupEnv, os.Stdin, os.Stdout)`.
 The runner (`internal/plugin/runner.go`) reads **config from env vars** (`PARAMETER_*`,
-`BUILD_PULL_REQUEST_NUMBER`, `REPOSITORY_ORG`, `REPOSITORY_NAME`), the **diff from stdin**, and the
+`BUILD_PULL_REQUEST_NUMBER`, `REPOSITORY_ORG`, `REPOSITORY_NAME`), the **diff** (from stdin by
+default, or fetched from the GitHub API — see `PARAMETER_DIFF_SOURCE` below), and the
 **coverage report from the file** at `PARAMETER_COVERAGE_FILE`.
 
 ```
-stdin (unified diff) ──► sourcelines/unifieddiff ──► []domain.SourceLine
+diff (unified) ──► sourcelines/unifieddiff ──► []domain.SourceLine
                                                           │  {Module,SrcDir,Pkg,FileName,LineNumber,LineValue}
 coverage file ──► coverage.Loader.Load() ──► coverage.Report
                                                           │
         calculator.DetermineCoverage(lines, report) ─────┘
             └ for each line: report.GetCoverageData(...) ──► []domain.SourceLineCoverage
                                                           │
-                          reporter.Forking{ Simple, GithubPullRequest }.Write(...)
+                          reporter.Forking{ Simple, GithubPullRequest, StepSummary }.Write(...)
                               ├─ Simple          → plain-text report to stdout (always)
-                              └─ GithubPullRequest → Markdown PR comment (only if creds present)
+                              ├─ GithubPullRequest → Markdown PR comment (only if creds present)
+                              └─ StepSummary     → Markdown to $GITHUB_STEP_SUMMARY (only if set)
 ```
 
 Key packages:
 - `internal/plugin/sourcelines/unifieddiff/changed_source_loader.go` — parses the unified diff into
   changed `SourceLine`s. `PARAMETER_SOURCE_DIRS` controls how a path prefix is split into `SrcDir`/`Pkg`.
+  Handles both `--unified=0` diffs (the stdin/Vela path, no context lines) and diffs that carry context
+  lines (e.g. from the GitHub API) — context lines advance the new-file line counter but aren't recorded.
+- `internal/plugin/githubdiff/diff.go` — alternative diff source. When `PARAMETER_DIFF_SOURCE=github`,
+  the runner fetches the PR diff from `GET /repos/{owner}/{repo}/pulls/{n}` with the
+  `application/vnd.github.v3.diff` media type instead of reading stdin. Default is `stdin`
+  (unchanged behavior). The `github` mode requires `PARAMETER_GH_API_KEY` + the three build-context vars.
 - `internal/plugin/coverage/` — `report.go` defines the two interfaces every format implements:
   `Loader.Load(file) (Report, error)` and `Report.GetCoverageData(module, sourceDir, pkg, fileName, lineNumber) (*CoverageData, bool)`.
 - `internal/plugin/calculator/calculator.go` — joins changed lines to coverage data.
 - `internal/plugin/reporter/` — `simple.go` (console), `github_pr.go` (PR comment markdown),
-  `forking.go` (runs all reporters), `utils.go` (`filePath`, `lineDescription`). Per-file
-  aggregation (`collectFileCoverage`) and `coverageStatusEmoji` live in `github_pr.go` and are
-  shared by both reporters (same package).
+  `step_summary.go` (writes the same markdown to `$GITHUB_STEP_SUMMARY`), `forking.go` (runs all
+  reporters), `utils.go` (`filePath`, `lineDescription`). Per-file aggregation
+  (`collectFileCoverage`), `coverageStatusEmoji`, and the shared markdown builder
+  (`buildMarkdownReport`, used by both `github_pr.go` and `step_summary.go`) live in `github_pr.go`.
+  The PR comment is **sticky**: `github_pr.go` first GETs the PR's comments, and if it finds the one
+  carrying the hidden `commentMarker` it PATCHes that comment instead of POSTing a new one.
 - `internal/plugin/domain/domain.go` — core types. Coverage is counted in **instructions**
   (`CoveredInstructionCount`/`MissedInstructionCount`), not lines (see below).
 
@@ -81,8 +92,9 @@ Key packages:
   JVM bytecode *instructions*, so a line can be partly covered. For Go/Python/LCOV the loaders emit
   exactly 1 instruction per line. The reports surface both units on purpose — do not "fix" this as if
   it were a bug. The user has explicitly asked for this distinction to be clear.
-- **Two output formats, one dataset.** `Simple` (plain text, stdout) and `GithubPullRequest`
-  (Markdown) render the same data differently. Change both if you change what's reported.
+- **Two output formats, one dataset.** `Simple` (plain text, stdout) renders one way;
+  `GithubPullRequest` and `StepSummary` both render the shared `buildMarkdownReport` output. Change
+  `Simple` and `buildMarkdownReport` if you change what's reported.
 - **The PR comment is posted only** when `gh_api_key` AND `BUILD_PULL_REQUEST_NUMBER` AND
   `REPOSITORY_ORG` AND `REPOSITORY_NAME` are all present; otherwise console-only. `GithubPullRequest`
   also returns early when there are zero changed lines with coverage data.
