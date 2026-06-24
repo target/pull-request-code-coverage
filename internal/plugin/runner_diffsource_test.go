@@ -56,7 +56,7 @@ func TestDefaultRunner_Run_DiffSourceUnknown(t *testing.T) {
 	propGetter.On("GetProperty", "PARAMETER_DIFF_SOURCE").Return("banana", true)
 
 	err := NewRunner().Run(propGetter.GetProperty, strings.NewReader(""), os.Stdout)
-	assert.EqualError(t, err, "Unknown PARAMETER_DIFF_SOURCE \"banana\" (expected \"stdin\" or \"github\")")
+	assert.EqualError(t, err, "Unknown PARAMETER_DIFF_SOURCE \"banana\" (expected \"stdin\", \"git\", or \"github\")")
 
 	propGetter.AssertExpectations(t)
 }
@@ -114,6 +114,49 @@ func TestDefaultRunner_Run_DiffSourceGithub_FetchesDiff(t *testing.T) {
 
 	assert.Equal(t, 1, diffRequests, "expected exactly one PR-diff fetch")
 	assert.Equal(t, "──────────────────────────────────────────────────────────────\n 📊 Patch Coverage Report  —  changed lines only\n──────────────────────────────────────────────────────────────\n\n Diff coverage: 97% 🟢  —  177 of 182 changed instructions covered\n\n Summary\n   Covered instructions       97%  (177)\n   Missed instructions         3%  (5)\n   Tracked changed lines       8%  (182)\n   Untracked changed lines    92%  (2216)\n\n Note: \"lines\" are the source lines you changed; \"instructions\" are the\n executable units the coverage tool counts inside them (one line can hold\n several, e.g. JaCoCo bytecode), so the two counts differ.\n\n Coverage by file  (lowest coverage first)\n     0%     0 cov /   4 miss   main.go\n    96%    27 cov /   1 miss   internal/plugin/runner.go\n   100%    10 cov /   0 miss   internal/plugin/calculator/calculator.go\n   100%    29 cov /   0 miss   internal/plugin/coverage/jacoco/report.go\n   100%    19 cov /   0 miss   internal/plugin/domain/domain.go\n   100%    25 cov /   0 miss   internal/plugin/reporter/reporter.go\n   100%    64 cov /   0 miss   internal/plugin/sourcelines/unifieddiff/changed_source_loader.go\n   100%     3 cov /   0 miss   internal/test/mocks/property_getter.go\n   (25 file(s) with no measurable lines omitted)\n\n Uncovered lines (5)\n   - internal/plugin/runner.go:72\n         func GetCoverageReportLoader(coverageType string, sourceDir string) coverage.Loader {\n   - main.go:10\n         \terr := plugin.NewRunner().Run(os.LookupEnv, os.Stdin, os.Stdout)\n   - main.go:12\n         \tif err != nil {\n   - main.go:13\n         \t\tlog.WithFields(log.Fields{\n   - main.go:17\n         \t\tos.Exit(1)\n\n──────────────────────────────────────────────────────────────\n", buf.String())
+
+	propGetter.AssertExpectations(t)
+}
+
+// When PARAMETER_DIFF_SOURCE is absent but VELA_PULL_REQUEST_TARGET is set the
+// runner should auto-select the "git" path. We verify this by confirming the
+// error comes from the git executor (not from stdin returning 0 lines), which
+// means the auto-detection fired.
+func TestDefaultRunner_Run_DiffSourceAutodetect_VelaTarget(t *testing.T) {
+	propGetter := mocks.NewMockPropertyGetter()
+
+	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
+	propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
+	propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("src/main/java", true)
+	// No PARAMETER_DIFF_SOURCE — auto-detect should kick in.
+	propGetter.On("GetProperty", "VELA_PULL_REQUEST_TARGET").Return("main", true)
+	// No PARAMETER_BASE_BRANCH either; runner falls back to VELA_PULL_REQUEST_TARGET.
+	propGetter.On("GetProperty", "PARAMETER_BASE_BRANCH").Return("", false)
+
+	err := NewRunner().Run(propGetter.GetProperty, strings.NewReader(""), os.Stdout)
+	// The git executor will fail (no real git remote in the test environment),
+	// but the error must originate from git fetch/diff, proving the "git" path
+	// was taken rather than the silent "stdin" path that would produce 0 lines.
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Failed fetching diff via git")
+
+	propGetter.AssertExpectations(t)
+}
+
+// PARAMETER_DIFF_SOURCE=git with an explicit PARAMETER_BASE_BRANCH should also
+// take the git path and surface a meaningful error when the branch is empty.
+func TestDefaultRunner_Run_DiffSourceGit_MissingBaseBranch(t *testing.T) {
+	propGetter := mocks.NewMockPropertyGetter()
+
+	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
+	propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
+	propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("src/main/java", true)
+	propGetter.On("GetProperty", "PARAMETER_DIFF_SOURCE").Return("git", true)
+	propGetter.On("GetProperty", "PARAMETER_BASE_BRANCH").Return("", false)
+	propGetter.On("GetProperty", "VELA_PULL_REQUEST_TARGET").Return("", false)
+
+	err := NewRunner().Run(propGetter.GetProperty, strings.NewReader(""), os.Stdout)
+	assert.EqualError(t, err, "Failed fetching diff via git: base branch is required for PARAMETER_DIFF_SOURCE=git (set PARAMETER_BASE_BRANCH or VELA_PULL_REQUEST_TARGET)")
 
 	propGetter.AssertExpectations(t)
 }
