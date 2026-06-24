@@ -34,7 +34,7 @@ func (l *Loader) Load() (io.Reader, error) {
 
 	fetchArgs := []string{"fetch", "--no-tags", "origin", l.baseBranch}
 	logrus.Infof("running git %v", fetchArgs)
-	fetchCmd := exec.Command("git", fetchArgs...)
+	fetchCmd := exec.Command("git", fetchArgs...) //nolint:gosec // args are controlled internally, not user input
 	if out, err := fetchCmd.CombinedOutput(); err != nil {
 		return nil, errors.Wrapf(err, "git fetch failed: %s", string(out))
 	}
@@ -44,7 +44,7 @@ func (l *Loader) Load() (io.Reader, error) {
 		diffArgs = append(diffArgs, l.module)
 	}
 	logrus.Infof("running git %v", diffArgs)
-	diffCmd := exec.Command("git", diffArgs...)
+	diffCmd := exec.Command("git", diffArgs...) //nolint:gosec // args are controlled internally, not user input
 	var stdout, stderr bytes.Buffer
 	diffCmd.Stdout = &stdout
 	diffCmd.Stderr = &stderr
