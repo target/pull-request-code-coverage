@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/target/pull-request-code-coverage/internal/test/mocks"
 )
 
@@ -119,9 +120,10 @@ func TestDefaultRunner_Run_DiffSourceGithub_FetchesDiff(t *testing.T) {
 }
 
 // When PARAMETER_DIFF_SOURCE is absent but VELA_PULL_REQUEST_TARGET is set the
-// runner should auto-select the "git" path. We verify this by confirming the
-// error comes from the git executor (not from stdin returning 0 lines), which
-// means the auto-detection fired.
+// runner should auto-select the "git" path. We verify this by using a branch
+// name that is guaranteed to not exist on any remote, so git fetch always fails
+// and the error message proves the "git" path was taken (not the silent "stdin"
+// path that would return 0 lines with no error).
 func TestDefaultRunner_Run_DiffSourceAutodetect_VelaTarget(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
 
@@ -129,15 +131,14 @@ func TestDefaultRunner_Run_DiffSourceAutodetect_VelaTarget(t *testing.T) {
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
 	propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("src/main/java", true)
 	// No PARAMETER_DIFF_SOURCE — auto-detect should kick in.
-	propGetter.On("GetProperty", "VELA_PULL_REQUEST_TARGET").Return("main", true)
-	// No PARAMETER_BASE_BRANCH either; runner falls back to VELA_PULL_REQUEST_TARGET.
+	// Use a branch that cannot exist on any remote so git fetch always fails.
+	propGetter.On("GetProperty", "VELA_PULL_REQUEST_TARGET").Return("this-branch-does-not-exist-xyzzy-99999", true)
 	propGetter.On("GetProperty", "PARAMETER_BASE_BRANCH").Return("", false)
 
 	err := NewRunner().Run(propGetter.GetProperty, strings.NewReader(""), os.Stdout)
-	// The git executor will fail (no real git remote in the test environment),
-	// but the error must originate from git fetch/diff, proving the "git" path
-	// was taken rather than the silent "stdin" path that would produce 0 lines.
-	assert.Error(t, err)
+	// require (not assert) so the test stops here on nil — prevents a nil-deref
+	// panic on the Contains check below.
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "Failed fetching diff via git")
 
 	propGetter.AssertExpectations(t)
