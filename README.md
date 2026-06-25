@@ -326,6 +326,7 @@ A working GitHub Actions example lives in [`.github/workflows/pr-coverage.yml`](
 | `module` | `PARAMETER_MODULE` | no | _(empty)_ | sub-module path prefix to strip, for multi-module projects (e.g. a Gradle multi-project build) |
 | `gh_api_key` | `PARAMETER_GH_API_KEY` (or `PLUGIN_GH_API_KEY`) | no | | token used to post the PR comment. If unset, no comment is posted (console only) |
 | `gh_api_base_url` | `PARAMETER_GH_API_BASE_URL` | no | `https://api.github.com` | GitHub API root. For GitHub Enterprise, use the full root including `/api/v3` |
+| `enabled` | `PARAMETER_ENABLED` | no | `true` | master on/off switch. Set to `false` to make the plugin do nothing and exit 0, so it can stay wired into a pipeline and be toggled off without removing the step. Any other value (or unset) means enabled |
 | `min_coverage` | `PARAMETER_MIN_COVERAGE` | no | _(empty)_ | diff-coverage gate: a percentage (e.g. `80`). When set, the step **fails** (exit 1) if diff coverage falls below it. Leave unset/empty to disable the gate (report only). A PR that changed no measurable lines counts as 100% and never fails |
 | `debug` | `PARAMETER_DEBUG` | no | `false` | enable debug logging |
 

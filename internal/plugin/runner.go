@@ -38,6 +38,19 @@ func (*DefaultRunner) Run(propertyGetter func(string) (string, bool), changedSou
 
 	logrus.Info("starting pull-request-code-coverage run")
 
+	// Master on/off switch. When PARAMETER_ENABLED is explicitly false the plugin
+	// does nothing and succeeds, so it can be left wired into a pipeline and
+	// toggled off without editing the step. Absent or unparseable means enabled,
+	// preserving the original always-on behavior.
+	if enabledStr, enabledFound := propertyGetter("PARAMETER_ENABLED"); enabledFound {
+		if enabled, parseErr := strconv.ParseBool(strings.TrimSpace(enabledStr)); parseErr != nil {
+			logrus.Infof("PARAMETER_ENABLED %q is not a valid boolean, defaulting to enabled", enabledStr)
+		} else if !enabled {
+			logrus.Info("PARAMETER_ENABLED is false, skipping coverage report")
+			return nil
+		}
+	}
+
 	rawSourceDirs, found := propertyGetter("PARAMETER_SOURCE_DIRS")
 	if !found {
 		return errors.New("Missing property PARAMETER_SOURCE_DIRS")

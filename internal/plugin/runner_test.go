@@ -49,6 +49,7 @@ func TestDefaultRunner_RunNotFoundProps(t *testing.T) {
 	for idx, tt := range tts {
 		t.Run(strconv.Itoa(idx), func(t *testing.T) {
 			propGetter := mocks.NewMockPropertyGetter()
+			propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 			for p, v := range tt.foundProps {
 				propGetter.On("GetProperty", p).Return(v, true)
@@ -70,6 +71,7 @@ func TestDefaultRunner_Run_GoExample_WithSourceDir(t *testing.T) {
 
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -104,6 +106,7 @@ func TestDefaultRunner_Run_GoExample(t *testing.T) {
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -137,6 +140,7 @@ func TestDefaultRunner_Run_PythonExample(t *testing.T) {
 
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -169,6 +173,7 @@ func TestDefaultRunner_Run_LcovExample(t *testing.T) {
 
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -202,6 +207,7 @@ func TestDefaultRunner_Run(t *testing.T) {
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -234,6 +240,7 @@ func TestDefaultRunner_Run_Vela(t *testing.T) {
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -267,6 +274,7 @@ func TestDefaultRunner_Run_2_Source_Dirs(t *testing.T) {
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -300,6 +308,7 @@ func TestDefaultRunner_Run_2_Source_Dirs_Vela(t *testing.T) {
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -334,6 +343,7 @@ func TestDefaultRunner_Run_NoChanges(t *testing.T) {
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -365,6 +375,7 @@ func TestDefaultRunner_Run_NoChanges_Vela(t *testing.T) {
 	mocks.WithMockGithubAPI(func(mockServerURL string, requestAsserter mocks.GithubAPIRequestAsserter) {
 
 		propGetter := mocks.NewMockPropertyGetter()
+		propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -394,6 +405,7 @@ func TestDefaultRunner_Run_NoChanges_Vela(t *testing.T) {
 
 func TestDefaultRunner_RunNoCoverageData(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 	propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
@@ -420,6 +432,7 @@ func TestDefaultRunner_RunNoCoverageData(t *testing.T) {
 
 func TestDefaultRunner_Run_MinCoverageMet(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 	propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("50", true)
@@ -445,6 +458,7 @@ func TestDefaultRunner_Run_MinCoverageMet(t *testing.T) {
 
 func TestDefaultRunner_Run_MinCoverageBelow(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
 	propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("90", true)
@@ -468,6 +482,21 @@ func TestDefaultRunner_Run_MinCoverageBelow(t *testing.T) {
 	propGetter.AssertExpectations(t)
 }
 
+func TestDefaultRunner_Run_Disabled(t *testing.T) {
+	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("false", true)
+
+	var buf bytes.Buffer
+
+	// With the plugin switched off it does nothing, writes nothing, and succeeds
+	// without reading any other property.
+	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/sample_unified.diff"), &buf)
+	assert.NoError(t, err)
+	assert.Equal(t, "", buf.String())
+
+	propGetter.AssertExpectations(t)
+}
+
 func MustOpen(t *testing.T, filename string) *os.File {
 	f, err := os.Open(filename)
 
@@ -480,6 +509,7 @@ func MustOpen(t *testing.T, filename string) *os.File {
 
 func TestDefaultRunner_RunErrOpeningCoverFile(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/blahblah.xml", true)
 	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
@@ -499,6 +529,7 @@ func TestDefaultRunner_RunErrOpeningCoverFile(t *testing.T) {
 
 func TestDefaultRunner_RunBadUnified_UnfinishedBlock(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
@@ -520,6 +551,7 @@ func TestDefaultRunner_RunBadUnified_UnfinishedBlock(t *testing.T) {
 
 func TestDefaultRunner_RunBadUnified_UnfinishedBlock2(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
@@ -541,6 +573,7 @@ func TestDefaultRunner_RunBadUnified_UnfinishedBlock2(t *testing.T) {
 
 func TestDefaultRunner_RunBadUnified_BadFilename(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
@@ -562,6 +595,7 @@ func TestDefaultRunner_RunBadUnified_BadFilename(t *testing.T) {
 
 func TestDefaultRunner_RunBadUnified_ExtraLinesBlock(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
@@ -583,6 +617,7 @@ func TestDefaultRunner_RunBadUnified_ExtraLinesBlock(t *testing.T) {
 
 func TestDefaultRunner_RunBadUnified_AlphaInAtBlock(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
@@ -605,6 +640,7 @@ func TestDefaultRunner_RunBadUnified_AlphaInAtBlock(t *testing.T) {
 
 func TestDefaultRunner_RunBadUnified_AlphaInAtBlock2(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
@@ -627,6 +663,7 @@ func TestDefaultRunner_RunBadUnified_AlphaInAtBlock2(t *testing.T) {
 
 func TestDefaultRunner_RunCoverageNotXml(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.json", true)
 	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
@@ -649,6 +686,7 @@ func TestDefaultRunner_RunCoverageNotXml(t *testing.T) {
 
 func TestDefaultRunner_Run_2SourceDirsCobertura(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
+	propGetter.On("GetProperty", "PARAMETER_ENABLED").Return("", false)
 
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("cobertura", true)
 	propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return("src/main/java,src/main/kotlin", true)
