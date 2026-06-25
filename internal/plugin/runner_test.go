@@ -72,6 +72,7 @@ func TestDefaultRunner_Run_GoExample_WithSourceDir(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/example_go_coverage_with_source_dir.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("cobertura", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
@@ -105,6 +106,7 @@ func TestDefaultRunner_Run_GoExample(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/example_go_coverage.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("cobertura", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
@@ -137,6 +139,7 @@ func TestDefaultRunner_Run_PythonExample(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/example_python_coverage.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("python", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
@@ -168,6 +171,7 @@ func TestDefaultRunner_Run_LcovExample(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/example_lcov.info", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("lcov", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
@@ -200,6 +204,7 @@ func TestDefaultRunner_Run(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
@@ -231,6 +236,7 @@ func TestDefaultRunner_Run_Vela(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
@@ -263,6 +269,7 @@ func TestDefaultRunner_Run_2_Source_Dirs(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport_2_source_dirs.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
@@ -295,6 +302,7 @@ func TestDefaultRunner_Run_2_Source_Dirs_Vela(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReport_2_source_dirs.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
@@ -328,6 +336,7 @@ func TestDefaultRunner_Run_NoChanges(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReportEmpty.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
@@ -358,6 +367,7 @@ func TestDefaultRunner_Run_NoChanges_Vela(t *testing.T) {
 		propGetter := mocks.NewMockPropertyGetter()
 
 		propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+		propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestReportEmpty.xml", true)
 		propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
 		propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
@@ -386,6 +396,7 @@ func TestDefaultRunner_RunNoCoverageData(t *testing.T) {
 	propGetter := mocks.NewMockPropertyGetter()
 
 	propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+	propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("", false)
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/jacocoTestEmptyReport.xml", true)
 	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("category-search", true)
 	propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("jacoco", true)
@@ -403,6 +414,56 @@ func TestDefaultRunner_RunNoCoverageData(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, "──────────────────────────────────────────────────────────────\n 📊 Patch Coverage Report  —  changed lines only\n──────────────────────────────────────────────────────────────\n Modules: category-search\n\n Diff coverage: 100% 🟢  —  0 of 0 changed instructions covered\n\n Summary\n   Covered instructions      100%  (0)\n   Missed instructions         0%  (0)\n   Tracked changed lines       0%  (0)\n   Untracked changed lines   100%  (9)\n\n Note: \"lines\" are the source lines you changed; \"instructions\" are the\n executable units the coverage tool counts inside them (one line can hold\n several, e.g. JaCoCo bytecode), so the two counts differ.\n\n Coverage by file  (lowest coverage first)\n   (no files with measurable lines)\n   (4 file(s) with no measurable lines omitted)\n\n Uncovered lines (0)\n   none 🎉\n\n──────────────────────────────────────────────────────────────\n", buf.String())
+
+	propGetter.AssertExpectations(t)
+}
+
+func TestDefaultRunner_Run_MinCoverageMet(t *testing.T) {
+	propGetter := mocks.NewMockPropertyGetter()
+
+	propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+	propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("50", true)
+	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/example_python_coverage.xml", true)
+	propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("python", true)
+	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return(".", true)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
+
+	var buf bytes.Buffer
+
+	// 71% diff coverage clears the 50% minimum, so the run succeeds.
+	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/example_python_unified.diff"), &buf)
+	assert.NoError(t, err)
+
+	propGetter.AssertExpectations(t)
+}
+
+func TestDefaultRunner_Run_MinCoverageBelow(t *testing.T) {
+	propGetter := mocks.NewMockPropertyGetter()
+
+	propGetter.On("GetProperty", "PARAMETER_DEBUG").Return("false", true)
+	propGetter.On("GetProperty", "PARAMETER_MIN_COVERAGE").Return("90", true)
+	propGetter.On("GetProperty", "PARAMETER_COVERAGE_FILE").Return("../test/example_python_coverage.xml", true)
+	propGetter.On("GetProperty", "PARAMETER_COVERAGE_TYPE").Return("python", true)
+	propGetter.On("GetProperty", "PARAMETER_MODULE").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_SOURCE_DIRS").Return(".", true)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PLUGIN_GH_API_KEY").Return("", false)
+	propGetter.On("GetProperty", "PARAMETER_GH_API_BASE_URL").Return("", false)
+	propGetter.On("GetProperty", "BUILD_PULL_REQUEST_NUMBER").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_ORG").Return("", false)
+	propGetter.On("GetProperty", "REPOSITORY_NAME").Return("", false)
+
+	var buf bytes.Buffer
+
+	// 71% diff coverage is under the 90% minimum, so the run fails the build.
+	err := NewRunner().Run(propGetter.GetProperty, MustOpen(t, "../test/example_python_unified.diff"), &buf)
+	assert.EqualError(t, err, "diff coverage 71% is below the required minimum of 90%")
 
 	propGetter.AssertExpectations(t)
 }

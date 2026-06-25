@@ -46,6 +46,21 @@ func (r SourceLineCoverageReport) TotalMissedInstructions() int {
 	return result
 }
 
+// DiffCoveragePercent returns the headline diff-coverage figure: covered
+// instructions / (covered + missed) * 100. When the PR changed no measurable
+// instructions it returns 100, matching the reporters which treat "nothing to
+// measure" as fully covered, so such PRs are never failed by the coverage gate.
+func (r SourceLineCoverageReport) DiffCoveragePercent() float64 {
+	covered := r.TotalCoveredInstructions()
+	total := covered + r.TotalMissedInstructions()
+
+	if total == 0 {
+		return 100
+	}
+
+	return float64(covered) / float64(total) * 100
+}
+
 type SourceLineCoverage struct {
 	SourceLine
 	CoverageData
