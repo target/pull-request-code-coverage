@@ -70,7 +70,7 @@ Every run prints a report to the step's console (stdout):
 
 ```
 ──────────────────────────────────────────────────────────────
- 📊 Patch Coverage Report  —  changed lines only
+ 📊 Patch Coverage Report — 73% 🟡 — changed lines only
 ──────────────────────────────────────────────────────────────
  Modules: category-search
 
@@ -108,7 +108,7 @@ What each part shows:
 
 When GitHub credentials are set, the same report is posted as a PR comment. It renders like this:
 
-> ### 🛡️ Patch Coverage Report
+> ### 🛡️ Patch Coverage Report — `73%` 🟡
 >
 > Scope: **changed lines only** — the code this PR adds or edits, not whole files or the repo. It answers one thing — *did your tests run the code you just touched?*
 >

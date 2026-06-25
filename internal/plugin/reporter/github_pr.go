@@ -105,7 +105,8 @@ func (s *GithubPullRequest) createCommentBody(changedLinesWithCoverage domain.So
 
 	var b strings.Builder
 
-	b.WriteString("## 🛡️ Patch Coverage Report\n\n")
+	fmt.Fprintf(&b, "## 🛡️ Patch Coverage Report — `%.f%%` %v\n\n",
+		coveredPct, coverageStatusEmoji(coveredPct))
 	b.WriteString("> Scope: **changed lines only** — the code this PR adds or edits, not whole files or the repo. ")
 	b.WriteString("It answers one thing — *did your tests run the code you just touched?*\n\n")
 
