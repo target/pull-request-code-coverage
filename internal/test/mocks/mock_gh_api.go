@@ -11,10 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	HTTPResponseOK      = 200
-	HTTPResponseCreated = 201
-)
+const HTTPResponseCreated = 201
 
 type CapturedRequest struct {
 	req  *http.Request
@@ -30,15 +27,6 @@ func WithMockGithubAPI(doer func(mockServerURL string, requestAsserter GithubAPI
 				req:  r,
 				body: mustReadAll(r.Body),
 			})
-
-			// The sticky-comment reporter first GETs existing comments to decide
-			// whether to update or create. Return an empty list so it falls
-			// through to creating (POST) a new comment.
-			if r.Method == http.MethodGet {
-				w.WriteHeader(HTTPResponseOK)
-				_, _ = w.Write([]byte("[]"))
-				return
-			}
 
 			w.WriteHeader(HTTPResponseCreated)
 		}),
