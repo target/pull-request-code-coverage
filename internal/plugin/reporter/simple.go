@@ -45,7 +45,8 @@ func (s *Simple) Write(changedLinesWithCoverage domain.SourceLineCoverageReport)
 	var b strings.Builder
 
 	b.WriteString(consoleRule + "\n")
-	b.WriteString(" 📊 Patch Coverage Report  —  changed lines only\n")
+	fmt.Fprintf(&b, " 📊 Patch Coverage Report — %.f%% %s — changed lines only\n",
+		coveredPct, coverageStatusEmoji(coveredPct))
 	b.WriteString(consoleRule + "\n")
 
 	if modules := collectModules(changedLinesWithCoverage); len(modules) > 0 {
