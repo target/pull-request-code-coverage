@@ -137,6 +137,8 @@ When GitHub credentials are set, the same report is posted as a PR comment. It r
 It carries the same sections as the console — diff-coverage headline, summary table, per-file breakdown, and a collapsible list of uncovered lines.
 
 > **Note:** the PR comment is posted only when `gh_api_key`, the PR number, the org, and the repo name are all available. Without them the plugin still prints the console report.
+>
+> The comment is **sticky**: on later pushes the plugin finds the comment it posted before (via a hidden marker) and updates it in place, so a PR keeps a single, always-current coverage comment instead of a new one per push.
 
 ---
 
